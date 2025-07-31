@@ -1,0 +1,17 @@
+package com.security.spring.unit.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class AccountCheckResponse {
+    private String message;
+    private boolean status;
+    private Integer statusCode;
+    private AccountCheckObj accountCheckObj;
+}

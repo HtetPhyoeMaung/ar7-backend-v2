@@ -1,0 +1,54 @@
+name: CI/CD Pipeline for Spring Boot
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build with docker image
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          image: htetphyoemaung/ar7
+          tags: latest
+          registry: docker.io
+          dockerfile: Dockerfile
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Deploy to DigitalOcean
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          username: root
+          key: ${{ secrets.TEMP_SSH_PRIVATE_KEY }}
+          script: |
+            # Pull Redis and Spring Boot images
+            docker pull redis:latest
+            docker pull htetphyoemaung/ar7:latest
+
+            # Stop and remove old containers (if they exist) '
+            docker stop ar7-app redis-container || true
+            docker rm ar7-app redis-container || true
+
+            # Create a network for service communication
+            docker network create app-network || true
+
+            # Run Redis with 256MB limit
+            docker run -d --name redis-container --network app-network -m 256m redis:latest
+
+            # Run Spring Boot with 1GB limit and JVM options
+            docker run -d --name ar7-app --network app-network -p 8080:8080 -e SPRING_REDIS_HOST=redis-container -m 1g -e JAVA_OPTS="-Xms128m -Xmx256m" htetphyoemaung/ar7:latest

@@ -14,9 +14,9 @@ public class ConstantInformationForGameSoft {
 //    private String apiUrl = "https://prodmd.9977997.com"; production
     private String apiUrl = "https://staging.gsimw.com/"; // staging
     @Builder.Default
-    private String operatorCode = "E616";
+    private String operatorCode = "N5I1";
     @Builder.Default
     private int languageCode = 1;
     @Builder.Default
-    private String secretKey ="P8uzXq";
+    private String secretKey ="uahf7D3odaCUGJVddUvHhH";
 }

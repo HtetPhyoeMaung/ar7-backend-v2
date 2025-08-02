@@ -3,7 +3,7 @@ package com.security.spring.gamesoft.callback.dto;
 import java.math.BigDecimal;
 
 public enum Currency {
-    MMK(1), MMK2(1000), IDR(1000), IDR2(1000), MMK3(100);
+    MMK(1), MMK2(0.001), IDR(0.001), IDR2(0.001), MMK3(0.01);
 
     private final double rate;
 

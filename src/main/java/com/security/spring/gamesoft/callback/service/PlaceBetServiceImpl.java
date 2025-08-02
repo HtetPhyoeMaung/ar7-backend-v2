@@ -79,7 +79,7 @@ public class PlaceBetServiceImpl implements PlaceBetService{
                 beforeBalance = (long) userUnits.getMainUnit();
 
                 if (Math.abs(transaction.getAmount())>beforeBalance){
-                    throw new InsufficientBalanceException(ErrorMessageUtil.API_MEMBER_INSUFFICIENT_BALANCE);
+                    throw new InsufficientBalanceException(ErrorMessageUtil.API_MEMBER_INSUFFICIENT_BALANCE, user.getAr7Id());
                 }
                 balance = (long) (beforeBalance + transaction.getAmount());
                 userUnits.setMainUnit(balance);

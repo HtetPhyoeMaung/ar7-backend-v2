@@ -126,6 +126,7 @@ public class GlobalException {
         var callBackResponse = GetBalanceCallBackResponse.builder()
                 .code(ResponseCode.API_MEMBER_BALANCE_IS_INSUFFICIENT)
                 .message(ex.getMessage())
+                .memberAccount(ex.getMemberAccount())
                 .build();
         Response<GetBalanceCallBackResponse> response = new Response<>();
         response.setData(List.of(callBackResponse));

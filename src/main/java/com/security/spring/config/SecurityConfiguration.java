@@ -52,7 +52,7 @@ public class SecurityConfiguration {
                         "/swagger-ui/**",
                         "/wabjars/**",
                         "/swagger-ui.html",
-                        "/v1/api/seamless/",
+                        "/v1/api/seamless/**",
                         "/api/v1/gameSoft/Seamless/**",
                         "/api/v1/files/**",
                         "/api/test/**",

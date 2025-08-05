@@ -34,11 +34,13 @@ public class GameSoftGameProvider {
     @ToString.Exclude
     private GameType gameType;
 
-    @OneToMany(mappedBy = "productID",  cascade = CascadeType.ALL)
+    private boolean deleted;
+
+    @OneToMany(mappedBy = "productID",  cascade ={CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @ToString.Exclude
     private List<GameSoftTransaction> gameSoftTransactionList;
 
-    @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "provider", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @ToString.Exclude
     private List<GameSoftWager> gameSoftWagerList;
 

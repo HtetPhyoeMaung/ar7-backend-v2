@@ -60,6 +60,7 @@ public class GameSoftProviderServiceImpl implements GameSoftGameProviderService 
         List<GameSoftGameProvider> gameProviderList = gameProviderRepo.findAll();
         List<GameProviderObj> gameProviderObjList = gameProviderList
                 .stream()
+                .filter(gameSoftGameProvider -> !gameSoftGameProvider.isDeleted())
                 .map(
                         obj -> GameProviderObj
                                 .builder()
@@ -89,7 +90,7 @@ public class GameSoftProviderServiceImpl implements GameSoftGameProviderService 
     @Transactional
     public GameProviderResponse providerFindById(Integer providerId) {
         Optional<GameSoftGameProvider> gameProvider = gameProviderRepo.findById(providerId);
-        if (gameProvider.isEmpty()) {
+        if (gameProvider.isEmpty() || gameProvider.get().isDeleted()) {
             throw new DataNotFoundException("Game Provider Not Found");
         }
 
@@ -167,10 +168,11 @@ public class GameSoftProviderServiceImpl implements GameSoftGameProviderService 
         List<GameSoftGameProvider> gameProviderList;
 
         gameProviderList = gameProviderRepo.findByGameType(gameTypeGet);
-        System.out.println(gameProviderList);
+
 
         List<GameProviderObj> gameProviderObjList = gameProviderList
                 .stream()
+                .filter(gameSoftGameProvider -> !gameSoftGameProvider.isDeleted())
                 .map(
                         obj -> GameProviderObj
                                 .builder()
@@ -200,7 +202,10 @@ public class GameSoftProviderServiceImpl implements GameSoftGameProviderService 
 
     @Override
     public GameProviderResponse deleteProviderById(int providerId) {
-        gameProviderRepo.deleteById(providerId);
+        var gameProvider = gameProviderRepo.findById(providerId).orElseThrow(()->
+                new DataNotFoundException("Provider not found by ID : "+providerId));
+        gameProvider.setDeleted(true);
+        gameProviderRepo.save(gameProvider);
         return GameProviderResponse
                 .builder()
                 .status(true)

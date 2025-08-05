@@ -63,6 +63,7 @@ public class SecurityConfiguration {
                         ).permitAll()
 
                 .requestMatchers(GET,"api/v1/promotion-unit").permitAll()
+                .requestMatchers("/api/v1/provider-list/**").permitAll()
                 .requestMatchers(PUT,"api/v1/promotion-unit").hasRole(ADMIN.name())
 
                                 .requestMatchers("api/v1/dashboard/ads/**").hasRole(ADMIN.name())

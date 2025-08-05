@@ -5,4 +5,6 @@ import org.springframework.http.ResponseEntity;
 
 public interface ProviderListService {
     ResponseEntity<ProviderResponse> getProviderListByGameType(String gameType);
+
+    ResponseEntity<String> syncProviders();
 }

@@ -1,17 +1,23 @@
 package com.security.spring.gamesoft.getProviderList.service.impl;
 
 import com.security.spring.exceptionall.DataNotFoundException;
+import com.security.spring.gamesoft.gameType.entity.GameType;
 import com.security.spring.gamesoft.gameType.repo.GameTypeRepo;
+import com.security.spring.gamesoft.gameprovider.entity.GameSoftGameProvider;
 import com.security.spring.gamesoft.gameprovider.repository.GameProviderRepo;
 import com.security.spring.gamesoft.getProviderList.dto.ProviderDataFeign;
 import com.security.spring.gamesoft.getProviderList.dto.ProviderResponse;
 import com.security.spring.gamesoft.getProviderList.service.ProviderListService;
 import com.security.spring.utils.ConstantInformationForGameSoft;
+import com.security.spring.utils.ContextUtils;
 import com.security.spring.utils.SignUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -34,6 +40,7 @@ public class ProviderListServiceImpl implements ProviderListService {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
+    private final List blackListGameTypeCodes = List.of("14", "18", "19", "Q", "JACKPOT" , "BONUS");
     ConstantInformationForGameSoft constantDataObj = ConstantInformationForGameSoft.builder().build();
 
     private final String operatorCode = constantDataObj.getOperatorCode();
@@ -42,6 +49,7 @@ public class ProviderListServiceImpl implements ProviderListService {
     private final String thirdPartyRoute = apiUrl + "/api/operators/available-products";
 
     @Override
+    @Transactional
     public ResponseEntity<ProviderResponse> getProviderListByGameType(String gameType) {
         if (gameType!=null) {
             gameTypeRepo.findByCode(gameType).orElseThrow(() -> new DataNotFoundException("Game type not found: " + gameType));
@@ -89,5 +97,36 @@ public class ProviderListServiceImpl implements ProviderListService {
                     .build());
         }
         return null;
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<String> syncProviders() {
+        List<GameType> gameTypeList = gameTypeRepo.findAll();
+        if (gameTypeList.isEmpty()) {
+            return ResponseEntity.ok("No game types found.");
+        }
+
+        for (GameType gameType : gameTypeList) {
+            if (blackListGameTypeCodes.contains(gameType.getCode())) {
+                continue;
+            }
+            ResponseEntity<ProviderResponse> response = getProviderListByGameType(gameType.getCode());
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                List<ProviderResponse.ProviderData> providerListFromGameSoft = response.getBody().getProviders();
+                List<Long> productListFromDatabase = gameProviderRepo.findByGameType(gameType)
+                        .stream()
+                        .map(GameSoftGameProvider::getProduct)
+                        .toList();
+                List<ProviderResponse.ProviderData> newProviderList = providerListFromGameSoft.stream()
+                        .filter(providerData -> productListFromDatabase.contains(providerData.getProductCode()))
+                        .toList();
+                for (ProviderResponse.ProviderData newProvider : newProviderList) {
+                    GameSoftGameProvider gameProvider = GameSoftGameProvider.of(newProvider, gameType);
+                    gameProviderRepo.save(gameProvider);
+                }
+            }
+        }
+        return ResponseEntity.ok("Sync completed.");
     }
 }

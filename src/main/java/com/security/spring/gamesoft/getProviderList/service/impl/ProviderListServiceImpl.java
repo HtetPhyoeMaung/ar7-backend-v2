@@ -111,22 +111,41 @@ public class ProviderListServiceImpl implements ProviderListService {
             if (blackListGameTypeCodes.contains(gameType.getCode())) {
                 continue;
             }
+
             ResponseEntity<ProviderResponse> response = getProviderListByGameType(gameType.getCode());
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 List<ProviderResponse.ProviderData> providerListFromGameSoft = response.getBody().getProviders();
+
                 List<Long> productListFromDatabase = gameProviderRepo.findByGameType(gameType)
                         .stream()
                         .map(GameSoftGameProvider::getProduct)
                         .toList();
+
+                log.info("providerListFromDatabase : {}", productListFromDatabase);
+                log.info("providerListFromGameSoft : {}",
+                        providerListFromGameSoft.stream()
+                                .map(ProviderResponse.ProviderData::getProductCode)
+                                .toList()
+                );
+
                 List<ProviderResponse.ProviderData> newProviderList = providerListFromGameSoft.stream()
-                        .filter(providerData -> productListFromDatabase.contains(providerData.getProductCode()))
+                        .filter(providerData -> !productListFromDatabase.contains(providerData.getProductCode()))
                         .toList();
+
+                log.info("newProviderList : {}",
+                        newProviderList.stream()
+                                .map(ProviderResponse.ProviderData::getProductCode)
+                                .toList()
+                );
+
                 for (ProviderResponse.ProviderData newProvider : newProviderList) {
                     GameSoftGameProvider gameProvider = GameSoftGameProvider.of(newProvider, gameType);
                     gameProviderRepo.save(gameProvider);
                 }
             }
         }
+
         return ResponseEntity.ok("Sync completed.");
     }
+
 }

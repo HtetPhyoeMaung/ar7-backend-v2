@@ -96,10 +96,10 @@ public class StorageService {
 
 
     public String  getImageByName(String imageName) {
-        GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                new GeneratePresignedUrlRequest(BUCKET_NAME, imageName);
+//        GeneratePresignedUrlRequest generatePresignedUrlRequest =
+//                new GeneratePresignedUrlRequest(BUCKET_NAME, imageName);
 
-        return space.generatePresignedUrl(generatePresignedUrlRequest).toString();
+        return "https://ar7imageserversit.sgp1.cdn.digitaloceanspaces.com/"+imageName;
     }
 
     public String  updateImage(MultipartFile file, String filename) throws IOException {

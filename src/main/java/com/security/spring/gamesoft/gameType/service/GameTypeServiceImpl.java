@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 public class GameTypeServiceImpl implements GameTypeService{
 
     private final GameTypeRepo gameTypeRepo;
+    private final List showGameTypeList = List.of("SLOT", "FISHING", "18", "LIVE_CASINO", "SPORTS", "E_SPORTS");
 
     @Override
     @Transactional
@@ -53,25 +55,25 @@ public class GameTypeServiceImpl implements GameTypeService{
 
         List<GameTypeObj> gameTypeObjList = gameTypeList
                 .stream()
-                .map(
-                        obj -> GameTypeObj
-                                .builder()
-                                .code(obj.getCode())
-                                .description(obj.getDescription())
-                                .id(obj.getId())
-                                .build()
+                .filter(gameType -> showGameTypeList.contains(gameType.getCode()))
+                .map(gameType -> GameTypeObj.builder()
+                        .id(gameType.getId())
+                        .code(gameType.getCode())
+                        .description(gameType.getDescription())
+                        .sortNumber(gameType.getSortNumber())
+                        .build()
                 )
+                .sorted(Comparator.comparing(GameTypeObj::getSortNumber))
                 .toList();
 
-
-        return GameTypeResponse
-                .builder()
+        return GameTypeResponse.builder()
                 .message("Game Type All")
                 .statusCode(HttpStatus.OK.value())
                 .status(true)
                 .gameTypeObjList(gameTypeObjList)
                 .build();
     }
+
 
     @Override
     @Transactional

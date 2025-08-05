@@ -13,4 +13,5 @@ public class GameTypeObj {
     private Integer id;
     private String code;
     private String description;
+    private int sortNumber;
 }

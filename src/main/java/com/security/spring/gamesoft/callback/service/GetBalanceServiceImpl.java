@@ -52,20 +52,11 @@ public class GetBalanceServiceImpl implements GetBalanceService{
 
             BigDecimal mainUnit = BigDecimal.valueOf(currentUser.get().getUserUnits().getMainUnit());
             String currencyCode = data.getCurrency();
-            // Assuming CurrencyUtil.getCurrencyRate(currencyCode) correctly fetches the rate from the Currency enum
             BigDecimal rate = CurrencyUtil.getCurrencyRate(currencyCode);
 
-            // FIX: Perform division by the rate and then scale for the long representation.
-            // The error message "Expected 1/1000 conversion with 4 decimal places" implies:
-            // 1. The 'mainUnit' needs to be divided by the 'rate' (e.g., 1000 for MMK2).
-            // 2. The resulting decimal value should be formatted to 4 decimal places.
-            // 3. For the 'long balance' field, this decimal value must be multiplied by 10^4 (10000)
-            //    to implicitly carry the 4 decimal places as an integer.
-            BigDecimal actualConvertedBalance = mainUnit.divide(rate, 4, RoundingMode.HALF_UP);
-
-            // Convert the decimal value to a long by shifting the decimal point 4 places to the right
-            // (multiplying by 10000) to preserve the 4 decimal places as an integer.
-            long balance = actualConvertedBalance.multiply(BigDecimal.valueOf(10000)).longValue();
+            // Perform multiplication and convert to long
+            BigDecimal scaledBalance = mainUnit.multiply(rate).setScale(4, RoundingMode.HALF_UP);
+            long balance = scaledBalance.longValue();  // 4 d
 
             getBalanceCallBackResponseList.add(GetBalanceCallBackResponse
                     .builder()

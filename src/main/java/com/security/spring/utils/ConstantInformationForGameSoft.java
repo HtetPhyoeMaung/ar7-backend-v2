@@ -11,12 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ConstantInformationForGameSoft {
     @Builder.Default
-//    private String apiUrl = "https://prodmd.9977997.com"; production
-    private String apiUrl = "https://production.gsimw.com/"; // staging
+    private String apiUrl = "https://production.gsimw.com/";
     @Builder.Default
     private String operatorCode = "N5I1";
     @Builder.Default
-    private int languageCode = 1;
+    private int languageCode = 0;
     @Builder.Default
     private String secretKey ="fooaVY5hy2Za6jpvdC9KHc";
 }

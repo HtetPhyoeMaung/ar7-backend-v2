@@ -90,7 +90,7 @@ public class LunchGameServiceImpl implements LunchGameService{
                 .productID(data.getProductID())
                 .gameType(data.getGameType())
                 .languageCode(languageCode)
-                .operatorLobbyURL("https://tripleace.online/home")
+                .operatorLobbyURL("https://ar7.org/home")
                 .gameID(data.getGameID())
                 .platform(data.getPlatform())
                 .currency(provider.getCurrencyCode())

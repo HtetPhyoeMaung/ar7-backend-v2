@@ -39,6 +39,7 @@ public class SecurityConfiguration {
                 // Permit all access to the following paths
                 .requestMatchers(
                         "/api/v1/democontroller/**",
+                        "/api/v1/ggl/hot-games",
                         "/api/v1/user/checkAr7Id/**",
                         "/api/v1/auth/**",
                         "/v2/api-docs",

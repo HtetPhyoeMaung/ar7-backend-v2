@@ -86,6 +86,8 @@ public class User implements UserDetails , Serializable{
 
     private String parentUserId;
 
+    private boolean streamer = false;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JoinColumn(name="register_status_id", referencedColumnName = "id")
     @ToString.Exclude

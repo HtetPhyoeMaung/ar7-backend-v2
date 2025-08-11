@@ -42,7 +42,7 @@ public class SpaceTechServiceImpl implements SpaceTechService {
         SpaceTechGame spaceTechGame = SpaceTechGame.builder()
                 .gameCode(gameRequest.getGameCode())
                 .gameName(gameRequest.getGameName())
-                .gameType(gameTypeService.findById(gameRequest.getGameType()))
+                .gameType(gameTypeService.findByCode(String.valueOf(gameRequest.getGameType())))
                 .build();
        if (gameRequest.getImage()!=null){
            spaceTechGame.setImageName(storageService.uploadImage(gameRequest.getImage()));
@@ -119,8 +119,8 @@ public class SpaceTechServiceImpl implements SpaceTechService {
         return ResponseEntity.ok(dashboardResponse);
     }
 
-    private boolean existsByGameNameAndGameTypeId(String gameName, int  gameType) {
-        return spaceTechRepository.existsByGameNameAndGameType_Id(gameName, gameType);
+    private boolean existsByGameNameAndGameTypeId(String gameName, int gameType) {
+        return spaceTechRepository.existsByGameNameAndGameType_Id(gameName,gameType);
     }
 
     public SpaceTechGame getSpaceTechGameById(long gameId){

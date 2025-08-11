@@ -12,7 +12,6 @@ import com.security.spring.spacetechmm.repo.GameTableRepository;
 import com.security.spring.spacetechmm.repo.SpaceTechRepository;
 import com.security.spring.spacetechmm.service.GameTableService;
 import com.security.spring.storage.StorageService;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,7 +20,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,8 +34,8 @@ public class GameTableServiceImpl implements GameTableService {
     public GameTableResponseDto createGameTable(GameTableRequest request) throws IOException {
         SpaceTechGame spaceTechGameOpt = spaceTechGameRepository.findById(request.getSpaceTechId()).orElseThrow(()->
                 new NotFoundException("SpaceTechGame  not found"));
-         int gameCode = Integer.parseInt(spaceTechGameOpt.getGameType().getCode());
-        if (gameCode==17){
+         String  gameCode = spaceTechGameOpt.getGameType().getCode();
+        if (gameCode=="17"){
             throw new UnauthorizedException("This game type not allowed to create level-tables");
         }
 

@@ -2,9 +2,8 @@ package com.security.spring.spacetechmm.rest;
 
 import com.security.spring.config.JWTService;
 import com.security.spring.exceptionall.DataNotFoundException;
-import com.security.spring.gamesoft.gameType.repo.GameTypeRepo;
-import com.security.spring.spacetechmm.dto.SpaceTechResponse;
 import com.security.spring.spacetechmm.dto.SpaceTechGameRegisterObj;
+import com.security.spring.spacetechmm.dto.SpaceTechResponse;
 import com.security.spring.spacetechmm.entity.GameTable;
 import com.security.spring.spacetechmm.entity.SpaceTechGame;
 import com.security.spring.spacetechmm.repo.GameTableRepository;
@@ -72,6 +71,9 @@ public class SpaceTechController {
         log.info("Reach State FOUR");
         if (spaceTechGame.getGameType().getCode().equals(18)){
 
+            if (user.isStreamer()){
+                spaceTechGameRegisterObj.setType("streamer");
+            }
             spaceTechGameRegisterObj.setId(ar7Id);
             spaceTechGameRegisterObj.setLevel(gameTable.getLevel());
             spaceTechGameRegisterObj.setBalance((int) userUnits.getMainUnit());
@@ -82,6 +84,7 @@ public class SpaceTechController {
             spaceTechGameRegisterObj.setBalance((int) userUnits.getMainUnit());
         }
         log.info("Reach State FIVE");
+
         SpaceTechResponse response = restTemplate.postForObject(URL, spaceTechGameRegisterObj, SpaceTechResponse.class);
         userUnits.setMainUnit(0);
         unitRepository.save(userUnits);

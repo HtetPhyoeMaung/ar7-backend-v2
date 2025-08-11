@@ -1,6 +1,9 @@
 package com.security.spring.spacetechmm.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
@@ -14,5 +17,6 @@ public class SpaceTechGameRegisterObj {
    private String nickname;
    private Integer balance;
    private String profile;
+   private String type;
 
 }

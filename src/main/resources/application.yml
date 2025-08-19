@@ -6,9 +6,9 @@ spring:
     host: redis-container
     port: 6379
   datasource:
-    url: jdbc:mysql://ar7-db-sit-do-user-15535699-0.g.db.ondigitalocean.com:25060/ar7_db_sit?sessionVariables=sql_require_primary_key=0
-    username: ar7-db
-    password: AVNS_rzOj8asvSv0scu0Phfe
+    url: jdbc:mysql://ar7-db-do-user-15535699-0.f.db.ondigitalocean.com:25060/ar7_db?sessionVariables=sql_require_primary_key=0
+    username: doadmin
+    password: AVNS_SaAi_cdXAVYXAK0mJsk
     #    url: jdbc:mysql://localhost:3306/ar7_database
     #    username: kyawgyi
     #    password: admin

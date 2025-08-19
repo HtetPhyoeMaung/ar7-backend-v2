@@ -69,7 +69,7 @@ public class SpaceTechController {
                 .domain(domain)
                 .build();
         log.info("Reach State FOUR");
-        if (spaceTechGame.getGameType().getCode().equals("18")){
+        if (spaceTechGame.getGameType().getCode().equals("Myanmar_GAME")){
 
             if (user.isStreamer()){
                 spaceTechGameRegisterObj.setType("streamer");

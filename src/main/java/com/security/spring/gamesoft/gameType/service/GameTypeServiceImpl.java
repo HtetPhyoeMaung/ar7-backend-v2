@@ -144,7 +144,7 @@ public class GameTypeServiceImpl implements GameTypeService{
     public GameTypeResponse getAllSpaceTechGameTypes() {
         List<GameType> gameTypeList = gameTypeRepo.findAll();
         List<GameType> spaceTechGameTypeList = gameTypeList.stream().filter(gt->
-                gt.getCode().equals("17")||gt.getCode().equals("18")||gt.getCode().equals("19")
+                gt.getCode().equals("SHAN_BUGYI")||gt.getCode().equals("18")||gt.getCode().equals("19")
                 ).toList();
 
         List<GameTypeObj> gameTypeObjList =spaceTechGameTypeList.stream()

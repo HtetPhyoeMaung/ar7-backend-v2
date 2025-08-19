@@ -15,7 +15,7 @@ public class GameRequest {
 
     private String gameName;
 
-    private int gameType;
+    private String gameType;
 
     private MultipartFile image;
 }

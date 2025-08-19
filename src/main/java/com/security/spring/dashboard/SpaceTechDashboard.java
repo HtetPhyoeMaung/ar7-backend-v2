@@ -21,7 +21,7 @@ public class SpaceTechDashboard {
     @PostMapping
     public ResponseEntity<DashboardResponse> createGame(@RequestParam(name = "gameCode") String gameCode,
                                                         @RequestParam(name = "gameName") String gameName,
-                                                        @RequestParam(name = "gameType") int gameType,
+                                                        @RequestParam(name = "gameType") String  gameType,
                                                         @RequestParam(name = "image")MultipartFile image) throws IOException {
         GameRequest gameRequest = GameRequest.builder()
                 .gameCode(gameCode)
@@ -36,7 +36,7 @@ public class SpaceTechDashboard {
     public ResponseEntity<DashboardResponse> updateGame(
                                                         @PathVariable(name = "id") int gameId,
                                                         @RequestParam(name = "gameName") String gameName,
-                                                        @RequestParam(name = "gameType") int gameType,
+                                                        @RequestParam(name = "gameType") String  gameType,
                                                         @RequestParam(name = "image", required = false)MultipartFile image) throws IOException {
         GameRequest gameRequest = GameRequest.builder()
                 .gameName(gameName)

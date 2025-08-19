@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface SpaceTechRepository extends JpaRepository<SpaceTechGame,Long> {
-    boolean existsByGameNameAndGameType_Id(String gameName, int gameType);
+    boolean existsByGameNameAndGameType_Code(String gameName, String gameType);
 
 
     List<SpaceTechGame> findAllByGameType_Id(Long gameTypeId);

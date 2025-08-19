@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class GameTypeServiceImpl implements GameTypeService{
 
     private final GameTypeRepo gameTypeRepo;
-    private final List showGameTypeList = List.of("SLOT", "FISHING", "18", "LIVE_CASINO", "SPORTS", "E_SPORTS");
+    private final List showGameTypeList = List.of("SLOT", "FISHING", "18", "LIVE_CASINO", "SPORT_BOOK", "ESPORT", "Myanmar_GAME");
 
     @Override
     @Transactional

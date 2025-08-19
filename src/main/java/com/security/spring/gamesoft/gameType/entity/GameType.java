@@ -23,7 +23,7 @@ public class GameType {
     private Integer id;
     private String  code;
     private String description;
-    private Integer sortNumber;
+    private int sortNumber;
 
     @OneToMany(mappedBy = "gameType", orphanRemoval = true)
     private List<SpaceTechGame> spaceTechGameList;

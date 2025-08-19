@@ -14,12 +14,14 @@ import com.security.spring.storage.StorageService;
 import com.security.spring.utils.Constraint;
 import com.security.spring.utils.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SpaceTechServiceImpl implements SpaceTechService {
@@ -42,8 +44,9 @@ public class SpaceTechServiceImpl implements SpaceTechService {
         SpaceTechGame spaceTechGame = SpaceTechGame.builder()
                 .gameCode(gameRequest.getGameCode())
                 .gameName(gameRequest.getGameName())
-                .gameType(gameTypeService.findByCode(String.valueOf(gameRequest.getGameType())))
+                .gameType(gameTypeService.findByCode(gameRequest.getGameType()))
                 .build();
+       log.info("Game Type : {}", gameRequest.getGameType());
        if (gameRequest.getImage()!=null){
            spaceTechGame.setImageName(storageService.uploadImage(gameRequest.getImage()));
        }

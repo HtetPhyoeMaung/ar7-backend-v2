@@ -181,7 +181,7 @@ public class UserDetailReportServiceImpl implements UserDetailReportService {
                     .ar7Id(e.getGameSoftTransitionUser().getAr7Id())
                     .resultTime(e.getModifiedOn() != null ? e.getModifiedOn().toString() : null)
                     .transactionId(e.getTransactionId())
-                    .wagerId(e.getGameSoftWager().getId())
+                    .wagerId(e.getGameSoftWager() != null ? e.getGameSoftWager().getId() : null)
                     .gameCode(e.getGameCode())
                     .beforeBetAmount(e.getBetAmount())
                     .betAmount(e.getBetAmount())

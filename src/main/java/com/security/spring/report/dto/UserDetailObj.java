@@ -13,7 +13,7 @@ public class UserDetailObj {
     private String  betTime;
     private String  resultTime;
     private String transactionId;
-    private long wagerId;
+    private Long wagerId;
     private String  gameCode;
     private String gameName;
     private String gameTypeCode;

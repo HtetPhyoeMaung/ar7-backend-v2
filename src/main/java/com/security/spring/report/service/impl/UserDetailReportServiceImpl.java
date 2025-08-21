@@ -106,6 +106,7 @@ public class UserDetailReportServiceImpl implements UserDetailReportService {
 
         Page<GameSoftTransaction> gameSoftTransactionPage = gameSoftTransactionRepo.findByCreatedOnBetweenAndGameSoftTransitionUser_Ar7IdAndGameType_IdAndStatus(DateUitls.parseDateTime(request.getStartDate()),DateUitls.parseDateTime(request.getEndDate()),request.getAr7Id(),request.getGameTypeId(),"SETTLED",pageable);
         log.info(Constraint.RETRIEVE_SUCCESS_MESSAGE);
+        log.info(String.valueOf(gameSoftTransactionPage.getTotalElements()));
 
         List<UserDetailObj> userDetailObjList = buildUserDetailObjList(gameSoftTransactionPage);
         return buildUserDetailResponse(userDetailObjList,gameSoftTransactionPage);
@@ -177,19 +178,19 @@ public class UserDetailReportServiceImpl implements UserDetailReportService {
         
         return transactionListOfUser.stream().map(e->
              UserDetailObj.builder()
-                    .betTime(e.getCreatedOn().toString())
-                    .ar7Id(e.getGameSoftTransitionUser().getAr7Id())
-                    .resultTime(e.getModifiedOn() != null ? e.getModifiedOn().toString() : null)
-                    .transactionId(e.getTransactionId())
-                    .wagerId(e.getGameSoftWager() != null ? e.getGameSoftWager().getId() : null)
-                    .gameCode(e.getGameCode())
-                    .beforeBetAmount(e.getBetAmount())
-                    .betAmount(e.getBetAmount())
-                    .winAmount(e.getAmount()>=0?e.getAmount():0.0)
-                    .transactionAmount(e.getAmount())
-                    .status(e.getStatus())
-                    .gameName(e.getGameType().getDescription())
-                    .gameTypeCode(e.getGameType().getCode())
+                     .betTime(e.getCreatedOn() != null ? e.getCreatedOn().toString() : null)
+                     .ar7Id(e.getGameSoftTransitionUser() != null ? e.getGameSoftTransitionUser().getAr7Id() : null)
+                     .resultTime(e.getModifiedOn() != null ? e.getModifiedOn().toString() : null)
+                     .transactionId(e.getTransactionId())
+                     .wagerId(e.getGameSoftWager() != null ? Long.valueOf(e.getGameSoftWager().getId()) : null)
+                     .gameCode(e.getGameCode())
+                     .beforeBetAmount(e.getBetAmount())
+                     .betAmount(e.getBetAmount())
+                     .winAmount(e.getAmount() >= 0 ? e.getAmount() : 0.0)
+                     .transactionAmount(e.getAmount())
+                     .status(e.getStatus())
+                     .gameName(e.getGameType() != null ? e.getGameType().getDescription() : null)
+                     .gameTypeCode(e.getGameType() != null ? e.getGameType().getCode() : null)
                     .build()).toList();
 
     }

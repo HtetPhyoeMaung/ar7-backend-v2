@@ -15,5 +15,5 @@ public class UserPlayDetailTransitionGroupKey {
     private String ar7Id;
     private String  startDate;
     private String  endDate;
-    private int gameTypeId;
+    private Integer gameTypeId;
 }

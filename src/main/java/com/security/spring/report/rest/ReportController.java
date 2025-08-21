@@ -38,7 +38,7 @@ public class ReportController {
                                                                    @RequestParam(name = "ar7Id") String ar7Id ,
                                                                    @RequestParam(name = "startDate") String startDate,
                                                                    @RequestParam(name = "endDate") String endDate,
-                                                                   @RequestParam(name = "gameTypeId") int gameTypeId,
+                                                                   @RequestParam(name = "gameTypeId") Integer gameTypeId,
                                                                    @RequestParam(name = "page") int page,
                                                                    @RequestParam(name = "size") int size){
         UserPlayDetailTransitionGroupKey userPlayDetailTransitionGroupKey = UserPlayDetailTransitionGroupKey.builder()

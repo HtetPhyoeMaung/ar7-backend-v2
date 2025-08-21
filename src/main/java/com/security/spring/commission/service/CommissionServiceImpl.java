@@ -419,7 +419,7 @@ public class CommissionServiceImpl implements CommissionService {
 
     public List<UserWinLoseDetailObj> getUserDetailByCalculationStatusFalse() {
         log.info("Reached State One");
-        List<GameSoftTransaction> gameSoftTransactionList = gameSoftTransactionRepo.findByWagerStatusAndIsCommissionCalculate("SETTLED",false);
+        List<GameSoftTransaction> gameSoftTransactionList = gameSoftTransactionRepo.findByStatusAndIsCommissionCalculate("SETTLED",false);
         if (gameSoftTransactionList.isEmpty()){
             throw new DataNotFoundException("There is no game transactions for calculate");
         }

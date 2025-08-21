@@ -18,9 +18,7 @@ import com.security.spring.utils.UserPlayDetailTransitionGroupKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -51,7 +49,7 @@ public class UserDetailReportServiceImpl implements UserDetailReportService {
             gameSoftTransactionPage = gameSoftTransactionRepo.findByGameSoftTransitionUser(user);
         }else {
 
-            gameSoftTransactionPage = gameSoftTransactionRepo.findByGameSoftTransitionUserAndWagerStatusAndCreatedOnBetween(user,"SETTLED",startDate, endDate);
+            gameSoftTransactionPage = gameSoftTransactionRepo.findByGameSoftTransitionUserAndStatusAndCreatedOnBetween(user,"SETTLED",startDate, endDate);
         }
 
         List<UserReportObj> userReportObjList = getGroupedUserReportList(gameSoftTransactionPage);

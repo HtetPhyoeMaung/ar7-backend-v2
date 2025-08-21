@@ -33,9 +33,9 @@ public interface GameSoftTransactionRepo extends JpaRepository<GameSoftTransacti
     List<GameSoftTransaction> findByStatus(String  wagerStatus);
 
 
-    List<GameSoftTransaction> findByWagerStatusAndIsCommissionCalculate(String  wagerStatus, boolean b);
+    List<GameSoftTransaction> findByStatusAndIsCommissionCalculate(String  wagerStatus, boolean b);
 
-    List<GameSoftTransaction> findByGameSoftTransitionUserAndWagerStatusAndCreatedOnBetween(User user, String  wagerStatus, LocalDateTime startDate, LocalDateTime endDate);
+    List<GameSoftTransaction> findByGameSoftTransitionUserAndStatusAndCreatedOnBetween(User user, String  wagerStatus, LocalDateTime startDate, LocalDateTime endDate);
 
     Page<GameSoftTransaction> findByCreatedOnBetweenAndGameSoftTransitionUser_Ar7IdAndGameType_IdAndStatus(LocalDateTime localDateTime, LocalDateTime localDateTime1, String ar7Id, int gameTypeId, String  wagerStatus, Pageable pageable);
 

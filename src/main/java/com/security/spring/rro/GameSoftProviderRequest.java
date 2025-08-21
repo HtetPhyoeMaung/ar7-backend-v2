@@ -16,6 +16,6 @@ public class GameSoftProviderRequest {
     private String productCode;
     private String  gameTypeCode;
     private String currencyCode;
-    private double conversionRate;
+    private Double conversionRate;
     private MultipartFile image;
 }

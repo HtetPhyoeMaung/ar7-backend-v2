@@ -40,7 +40,7 @@ public class GameSoftProviderServiceImpl implements GameSoftGameProviderService 
                 .productCode(data.getProductCode())
                 .imageName(storageService.uploadImage(data.getImage()))
                 .currencyCode(data.getCurrencyCode())
-                .conversionRate(data.getConversionRate())
+                .conversionRate(data.getConversionRate() != null ? data.getConversionRate() : 1.0)
                 .gameType(gameType)
                 .build();
 
@@ -132,10 +132,14 @@ public class GameSoftProviderServiceImpl implements GameSoftGameProviderService 
         updateObj.setProduct(data.getProduct() != null ? data.getProduct() : updateObj.getProduct());
         updateObj.setProductCode(data.getProductCode() != null ? data.getProductCode() : updateObj.getProductCode());
         updateObj.setCurrencyCode(data.getCurrencyCode() != null ? data.getCurrencyCode() : updateObj.getCurrencyCode());
-        updateObj.setConversionRate( updateObj.getConversionRate());
+        updateObj.setConversionRate(data.getConversionRate() != null ? data.getConversionRate() : updateObj.getConversionRate());
         updateObj.setGameType(gameType != null ? gameType : updateObj.getGameType());
         if (data.getImage()!=null){
-            updateObj.setImageName(storageService.updateImage(data.getImage(),updateObj.getImageName()));
+            if(updateObj.getImageName() == null || updateObj.getImageName().isEmpty()){
+                updateObj.setImageName(storageService.uploadImage(data.getImage()));
+            }else{
+                updateObj.setImageName(storageService.updateImage(data.getImage(),updateObj.getImageName()));
+            }
         }
         gameProviderRepo.save(updateObj);
 

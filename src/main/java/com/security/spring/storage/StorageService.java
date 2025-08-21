@@ -107,7 +107,7 @@ public class StorageService {
         // Check if the file exists in the bucket
         try {
             // Try to retrieve the existing object
-            S3Object existS3Object = space.getObject("digizenger-image", filename);
+            S3Object existS3Object = space.getObject(BUCKET_NAME, filename);
 
             // If object exists, delete it
             if (existS3Object != null) {

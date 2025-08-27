@@ -82,7 +82,7 @@ public class SpaceTechServiceImpl implements SpaceTechService {
     public ResponseEntity<DashboardResponse> updateGame(GameRequest gameRequest, long gameId) throws IOException {
         SpaceTechGame spaceTechGame = getSpaceTechGameById(gameId);
         spaceTechGame.setGameName(gameRequest.getGameName());
-        spaceTechGame.setGameType(gameTypeService.findByCode(gameRequest.getGameType()));
+        spaceTechGame.setGameType(gameTypeService.findById(Integer.parseInt(gameRequest.getGameType())));
         if (gameRequest.getImage()!=null) {
             if (spaceTechGame.getImageName()!=null) {
                 spaceTechGame.setImageName(storageService.updateImage(gameRequest.getImage(), spaceTechGame.getImageName()));

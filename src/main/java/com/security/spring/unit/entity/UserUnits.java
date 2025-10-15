@@ -27,6 +27,8 @@ public class UserUnits implements Serializable {
     private double gameUnit;
     private double promotionUnit;
     private int tickets;
+    private double turnAmount;// it will be reset after withdrawal or reduced by betting
+    private double totalBetUnit;
     @OneToOne(mappedBy = "userUnits")
     @ToString.Exclude
     @JsonIgnore

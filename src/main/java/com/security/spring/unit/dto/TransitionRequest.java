@@ -20,4 +20,5 @@ public class TransitionRequest {
     @NotEmpty(message = "Please collect want to transfer user")
     private String toAr7UserId;
     private String remark;
+    private Double turnAmount;
 }

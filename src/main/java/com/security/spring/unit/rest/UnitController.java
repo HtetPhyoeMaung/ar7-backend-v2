@@ -12,6 +12,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("api/v1/un")
@@ -137,5 +139,14 @@ public class UnitController {
                 DateUitls.parseDateTime(endDate));
         return ResponseEntity.ok()
                 .body(transitionResponse);
+    }
+
+    @PutMapping("/turnAmount")
+    public ResponseEntity<Map<String, Object>> updateTurnAmount(
+            @RequestParam("tripleId") String tripleId,
+            @RequestParam("turnAmount") double turnAmount
+    ) {
+        double updatedTurnAmount = unitService.updateDepositTurnAmount(tripleId, turnAmount);
+        return ResponseEntity.ok().body(Map.of("message", "Turn amount updated successfully", "turnAmount", updatedTurnAmount));
     }
 }

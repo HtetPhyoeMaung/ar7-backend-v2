@@ -28,5 +28,7 @@ public interface UnitService {
     void saveAll(List<UserUnits> userUnitsList);
 
     TransitionResponse fastTransferPlus(TransitionRequest data);
+
+    double updateDepositTurnAmount(String tripleId, Double turnAmount);
 }
 //

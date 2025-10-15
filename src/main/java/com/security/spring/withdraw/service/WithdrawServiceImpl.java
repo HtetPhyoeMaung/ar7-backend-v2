@@ -69,7 +69,6 @@ public class WithdrawServiceImpl implements WithdrawService{
     private final NotificationRepo notificationRepo;
 
 
-
     @Override
     @Transactional
     public WithdrawResponse saveWithdraw(WithdrawRequest data, String ar7Id) {
@@ -88,11 +87,7 @@ public class WithdrawServiceImpl implements WithdrawService{
         BankNameAuth bankNameAuth = bankNameAuthRepo.findByOwnerUserAndBankNameAndBankNameStatusIsTrue(parentUser,bankName).orElseThrow(()->
                 new DataNotFoundException("Hello User this bank name not provided to you , please contact with your agent"));
 
-        UserUnits currentUserUnit = currentUser.getUserUnits();
-        if(data.getWithdrawAmount() > currentUserUnit.getMainUnit()){
-            throw new DataNotFoundException("Hay Guy Your not sufficient balance for withdraw");
-        }
-        currentUserUnit.setMainUnit(currentUserUnit.getMainUnit() - data.getWithdrawAmount());;
+        UserUnits currentUserUnit = getUserUnits(data, currentUser);
         currentUser.setUserUnits(currentUserUnit);
         userRepository.save(currentUser);
 
@@ -142,6 +137,18 @@ public class WithdrawServiceImpl implements WithdrawService{
                 .status(true)
                 .message("Your Withdraw Is Pending , Please wait approve for agent.")
                 .build();
+    }
+    private static UserUnits getUserUnits(WithdrawRequest data, User currentUser) {
+        UserUnits currentUserUnit = currentUser.getUserUnits();
+
+        if(currentUserUnit.getTurnAmount() > 0){
+            throw new DataNotFoundException("You can't withdraw because you need to bet remaining unit amount : " + currentUserUnit.getTurnAmount());
+        }
+        if(data.getWithdrawAmount() > currentUserUnit.getMainUnit()){
+            throw new DataNotFoundException("Hay Guy Your not sufficient balance for withdraw");
+        }
+        currentUserUnit.setMainUnit(currentUserUnit.getMainUnit() - data.getWithdrawAmount());
+        return currentUserUnit;
     }
 
     @Override

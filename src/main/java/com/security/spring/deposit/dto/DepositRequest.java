@@ -16,6 +16,7 @@ public class DepositRequest {
 
     private Long depositId;
     private String depositStatus;
+    private Double turnAmount;
 
     @NotEmpty(message = "Please Enter Your transfer account")
     private String accountNumber;

@@ -88,6 +88,14 @@ public class PlaceBetServiceImpl implements PlaceBetService{
 
 
                 GameSoftTransaction transitionObj = MapperUtil.mapToTransaction(transaction, gameType, gameProvider, user, gameSoftWager, beforeBalance, balance);
+                if(transitionObj.getStatus().equals(Action.BET.name())){
+                    if(userUnits.getTurnAmount() < transaction.getValidBetAmount()){
+                        userUnits.setTurnAmount(0);
+                    }else {
+                        userUnits.setTurnAmount(userUnits.getTurnAmount() - transaction.getValidBetAmount());
+                    }
+                    userUnits.setTotalBetUnit(userUnits.getTotalBetUnit() + transaction.getValidBetAmount());
+                }
                 gameSoftTransactionRepo.save(transitionObj);
             }
             userRepository.save(user);

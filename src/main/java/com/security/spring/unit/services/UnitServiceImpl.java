@@ -17,6 +17,7 @@ import com.security.spring.unit.repo.UnitRepository;
 import com.security.spring.user.entity.User;
 import com.security.spring.user.dto.UserDAOImpl;
 import com.security.spring.user.repository.UserRepository;
+import com.security.spring.user.role.Role;
 import com.security.spring.user.service.UserService;
 import com.security.spring.utils.ContextUtils;
 import com.security.spring.utils.CurrentDateTime;
@@ -570,10 +571,11 @@ public class UnitServiceImpl implements UnitService{
             currentUserUnitObj.setMainUnit(currentUserUnitObj.getMainUnit() - data.getAmount());
             unitRepository.save(currentUserUnitObj);
             UserUnits toUserUnitObject = toUser.getUserUnits();
+            if(currentUser.getRole().equals(Role.AGENT)){
+                toUserUnitObject.setTurnAmount(toUserUnitObject.getTurnAmount() > 0 ? toUserUnitObject.getTurnAmount() + data.getTurnAmount() : data.getTurnAmount());
+            }
             toUserUnitObject.setMainUnit(toUserUnitObject.getMainUnit() + data.getAmount());
             unitRepository.save(toUserUnitObject);
-
-
 
             TransitionHistory transitionHistoryObj = TransitionHistory
                     .builder()
@@ -612,6 +614,23 @@ public class UnitServiceImpl implements UnitService{
             throw new UnauthorizedException("You can't transfer this user id + "+data.getToAr7UserId());
         }
 
+    }
+
+    @Override
+    public double updateDepositTurnAmount(String tripleId, Double turnAmount) {
+        String currentUserTripleId = ContextUtils.getAr7IdFromContext();
+        User currentUser = userService.findByAr7Id(currentUserTripleId);
+        if(!currentUser.getRole().equals(ADMIN) && !currentUser.getRole().equals(AGENT)){
+            throw new UnauthorizedException("Your role was not allowed for this operation");
+        }
+        User toUser = userService.findByAr7Id(tripleId);
+        UserUnits toUserUnit = toUser.getUserUnits();
+        if(turnAmount < 0){
+            throw new DataNotFoundException("turnAmount must be greater than or equal to 0");
+        }
+        toUserUnit.setTurnAmount(turnAmount);
+        toUserUnit = unitRepository.save(toUserUnit);
+        return toUserUnit.getTurnAmount();
     }
 }
 

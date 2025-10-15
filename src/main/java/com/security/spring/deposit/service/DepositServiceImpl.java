@@ -305,6 +305,9 @@ public class DepositServiceImpl implements DepositService{
             userRepository.save(currentUser);
 
             depositUserUnit.setMainUnit(depositUserUnit.getMainUnit() + depositGet.getAmount());
+            if(currentUser.getRole().equals(Role.AGENT) && data.getTurnAmount() != null){
+                depositUserUnit.setTurnAmount(depositUserUnit.getTurnAmount() > 0 ? depositUserUnit.getTurnAmount() + data.getTurnAmount() : data.getTurnAmount());
+            }
             depositUser.setUserUnits(depositUserUnit);
             userRepository.save(depositUser);
             depositGet.setStatus(DepositStatus.COMPLETE);

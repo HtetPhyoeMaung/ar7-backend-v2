@@ -39,7 +39,7 @@ public class UserDetailReportServiceImpl implements UserDetailReportService {
     private final CommissionConfirmRepo commissionConfirmRepo;
 
     @Override
-    public ResponseEntity<UserDetailsResponse> getUserDetailReportByAr7Id(String ar7Id, LocalDateTime startDate, LocalDateTime  endDate) {
+    public UserDetailsResponse getUserDetailReportByAr7Id(String ar7Id, LocalDateTime startDate, LocalDateTime  endDate) {
 
 
         User user = userRepository.findByAr7Id(ar7Id).orElseThrow(() ->
@@ -61,7 +61,7 @@ public class UserDetailReportServiceImpl implements UserDetailReportService {
                 .userReportObjList(userReportObjList)
                 .build();
 
-        return ResponseEntity.ok(userDetailsResponse);
+        return userDetailsResponse;
     }
 
     private List<UserReportObj> getGroupedUserReportList(List<GameSoftTransaction> gameSoftTransactionPage) {

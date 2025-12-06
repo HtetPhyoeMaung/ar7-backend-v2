@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public interface UserDetailReportService {
 
 
-    ResponseEntity<UserDetailsResponse> getUserDetailReportByAr7Id(String ar7Id, LocalDateTime startDate, LocalDateTime  endDate);
+    UserDetailsResponse getUserDetailReportByAr7Id(String ar7Id, LocalDateTime startDate, LocalDateTime  endDate);
 
     ResponseEntity<UserDetailsResponse> getUserDetailReport(String token, UserPlayDetailTransitionGroupKey userPlayDetailTransitionGroupKey, Pageable pageable);
 

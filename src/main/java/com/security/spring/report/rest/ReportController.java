@@ -30,7 +30,7 @@ public class ReportController {
                                                                     @RequestParam(name = "endDate", required = false)String endDate
                                                                    ){
 
-       return userDetailReportService.getUserDetailReportByAr7Id(ar7Id, DateUitls.parseDateTime(startDate), DateUitls.parseDateTime(endDate));
+       return ResponseEntity.ok(userDetailReportService.getUserDetailReportByAr7Id(ar7Id, DateUitls.parseDateTime(startDate), DateUitls.parseDateTime(endDate)));
     }
 
     @GetMapping("/detail")

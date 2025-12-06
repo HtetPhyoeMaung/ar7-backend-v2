@@ -72,7 +72,7 @@ public class SecurityConfiguration {
                                 .requestMatchers("api/v1/ads/**").permitAll()
 
                 // /api/v1/user end point all
-                .requestMatchers("api/v1/user/**").hasAnyRole(ADMIN.name(), SENIORMASTER.name(), MASTER.name(),AGENT.name(),USER.name())
+                .requestMatchers("api/v1/user/**").hasAnyRole(ADMIN.name(), SENIORMASTER.name(), MASTER.name(),AGENT.name(),USER.name(), AFFILIATEAGENT.name())
                 .requestMatchers(GET, "api/v1/user/profile/**").hasAnyAuthority(String.valueOf(ADMIN_READ),String.valueOf(SENIORMASTER_READ),String.valueOf(MASTER_READ),String.valueOf(AGENT_READ),String.valueOf(USER_READ))
                 .requestMatchers(GET, "api/v1/user/profile/**").hasAnyAuthority(String.valueOf(ADMIN_READ),String.valueOf(SENIORMASTER_READ),String.valueOf(MASTER_READ),String.valueOf(AGENT_READ),String.valueOf(USER_READ))
                 .requestMatchers(PUT, "/api/v1/user/parentUserUpdate").hasAnyAuthority(String.valueOf(ADMIN_UPDATE),String.valueOf(SENIORMASTER_UPDATE),String.valueOf(MASTER_UPDATE),String.valueOf(AGENT_UPDATE),String.valueOf(USER_UPDATE))
@@ -93,7 +93,7 @@ public class SecurityConfiguration {
                 .requestMatchers(GET, "/api/v1/userByRole/{role}").hasAuthority("admin:read")
 
                 // Role and authority checks for /Downline User/ endpoint
-                .requestMatchers("api/v1/user/**").hasAnyRole(ADMIN.name(), SENIORMASTER.name(), MASTER.name(),AGENT.name(),USER.name())
+                .requestMatchers("api/v1/user/**").hasAnyRole(ADMIN.name(), SENIORMASTER.name(), MASTER.name(),AGENT.name(),USER.name(), AFFILIATEAGENT.name())
                 .requestMatchers(GET, "api/v1/user/downline/**").hasAnyAuthority(String.valueOf(ADMIN_READ),String.valueOf(SENIORMASTER_READ),String.valueOf(MASTER_READ),String.valueOf(AGENT_READ),String.valueOf(USER_READ))
                 // Role and Authority checks for /report endpoint
                 .requestMatchers("api/v1/rp/**").permitAll()

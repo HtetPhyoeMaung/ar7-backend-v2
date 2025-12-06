@@ -9,6 +9,8 @@ import com.security.spring.notification.entity.Notification;
 import com.security.spring.notification.repository.NotificationRepo;
 import com.security.spring.promotion.dto.TicketBoxResponse;
 import com.security.spring.promotion.entity.TicketBox;
+import com.security.spring.report.dto.UserReportObj;
+import com.security.spring.report.service.UserDetailReportService;
 import com.security.spring.rro.ResponseFormat;
 import com.security.spring.user.dto.*;
 import com.security.spring.user.entity.User;
@@ -25,7 +27,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +41,7 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepo;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final NotificationRepo notificationRepo;
+    private final UserDetailReportService userDetailReportService;
 
     @Override
     @Transactional
@@ -153,10 +158,20 @@ public class UserServiceImpl implements UserService{
     @Transactional
     public UserResponse getDownLineUserByUpLineId(String ar7Id, Pageable pageable, String searchData) {
         Page<User> userPage;
-        if(searchData == null){
-            userPage = userRepo.findByParentUserId(ar7Id,pageable);
-        }else{
-            userPage = userRepo.findByParentUserIdAndAr7IdContainingIgnoreCase(ar7Id,searchData,pageable);
+        if(searchData == null) {
+            if (ar7Id.startsWith("AFG")) {
+                User user = findByAr7Id(ar7Id);
+                userPage = userRepo.findByPromoCode(user.getCode(),pageable);
+            } else {
+                userPage = userRepo.findByParentUserId(ar7Id, pageable);
+            }
+        }else {
+            if (ar7Id.startsWith("AFG")) {
+                User user = findByAr7Id(ar7Id);
+                userPage = userRepo.findByPromoCodeAndAndAr7IdContainingIgnoreCase(user.getCode(), searchData, pageable);
+            } else {
+                userPage = userRepo.findByParentUserIdAndAr7IdContainingIgnoreCase(ar7Id, searchData, pageable);
+            }
         }
 
         List<UserResponseObj> userResponseObjList = userPage.map(data ->{
@@ -173,6 +188,17 @@ public class UserServiceImpl implements UserService{
                     .secretCode(data.getSecretCode())
                     .parentUserId(data.getParentUserId())
                     .build();
+            if (ar7Id.startsWith("AFG")){
+
+                 var userDetailReport =   userDetailReportService.getUserDetailReportByAr7Id(data.getAr7Id(), LocalDate.now().atStartOfDay(),LocalDate.now().with(TemporalAdjusters.lastDayOfMonth()).atStartOfDay());
+                 if (userDetailReport != null) {
+                     userResponseObj.setWinLoseAmount(userDetailReport.getUserReportObjList()
+                             .stream().mapToDouble(UserReportObj::getWinLoseAmount).sum());
+                 }else {
+                     userResponseObj.setWinLoseAmount(0);
+                 }
+
+            }
             if(data.getTicketBox() != null){
                 TicketBox ticketBox = data.getTicketBox();
                 TicketBoxResponse ticketBoxResponse = TicketBoxResponse.builder()

@@ -16,4 +16,5 @@ public class RegisterRequest {
     private Role role;
     private String secretCode;
     private String parentUserId;
+    private String promoCode;
 }

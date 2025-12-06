@@ -28,4 +28,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> findByStatusIsFalseAndAr7IdContainingIgnoreCase(String searchData, Pageable pageable);
 
     Page<User> findByRoleAndAr7IdContainingIgnoreCase(Role role, String searchData, Pageable pageable);
+
+    Page<User> findByPromoCode(String code, Pageable pageable);
+
+    Page<User> findByPromoCodeAndAndAr7IdContainingIgnoreCase(String code, String searchData, Pageable pageable);
 }

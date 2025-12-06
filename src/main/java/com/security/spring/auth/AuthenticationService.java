@@ -17,9 +17,7 @@ import com.security.spring.utils.OneTimePasswordService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -70,6 +68,7 @@ public class AuthenticationService {
             secretCode = registerRequest.getSecretCode();
             fullName = registerRequest.getFullName();
 
+
             user = User.builder()
                     .userId(0)
                     .name(fullName)
@@ -81,6 +80,10 @@ public class AuthenticationService {
                     .userUnits(unit)
                     .secretCode(secretCode)
                     .build();
+            if (downLineAr7Id.startsWith("AFG")){
+                user.setCode(AR7IdGenerate.generateKey(6));
+            }
+
             user = userRepository.save(user);
 
         }else {
@@ -112,6 +115,10 @@ public class AuthenticationService {
                         .userUnits(unit)
                         .secretCode(registerRequest.getSecretCode())
                         .build();
+
+                if (registerRequest.getPromoCode()!=null){
+                    user.setPromoCode(registerRequest.getPromoCode());
+                }
                 password = registerRequest.getPassword();
                 user = userRepository.save(user);
             }
@@ -143,6 +150,7 @@ public class AuthenticationService {
                 .role(user.getRole())
                 .secretCode(user.getSecretCode())
                 .ar7Id(user.getAr7Id())
+                .promoCode(user.getCode())
                 .status(true)
                 .build();
     }
@@ -251,4 +259,5 @@ public class AuthenticationService {
         userRepository.save(user);
         return TokenResponse.builder().accessToken(accessToken).build();
     }
+
 }

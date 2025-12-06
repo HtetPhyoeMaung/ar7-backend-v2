@@ -71,6 +71,10 @@ public class User implements UserDetails , Serializable{
     @Column(name="status")
     private boolean status;
 
+    private String code;
+
+    private String promoCode;
+
     @NotNull
     @NotEmpty
     @Column(name="secret_code")

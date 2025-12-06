@@ -28,5 +28,6 @@ public class UserResponseObj {
 //    private CommissionRe userComession;
     private String secretCode;
     private String parentUserId;
+    private double winLoseAmount;
     private TicketBoxResponse ticketBoxResponse;
 }

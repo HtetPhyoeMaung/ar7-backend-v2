@@ -1,8 +1,8 @@
 package com.security.spring.report.service.impl;
 
 import com.security.spring.exceptionall.DataNotFoundException;
-import com.security.spring.gamesoft.transaction.entity.GameSoftTransaction;
-import com.security.spring.gamesoft.transaction.repsitory.GameSoftTransactionRepo;
+import com.security.spring.thirdpartygames.transaction.entity.GameSoftTransaction;
+import com.security.spring.thirdpartygames.transaction.repsitory.GameSoftTransactionRepo;
 import com.security.spring.report.dto.ExitInfosObj;
 import com.security.spring.report.dto.SpaceTechReportObj;
 import com.security.spring.report.dto.SpaceTechGameReportResponse;

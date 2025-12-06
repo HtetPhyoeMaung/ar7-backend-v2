@@ -1,12 +1,12 @@
 
 package com.security.spring.utils;
 
-import com.security.spring.gamesoft.callback.dto.CallBackTransaction;
-import com.security.spring.gamesoft.gameType.entity.GameType;
-import com.security.spring.gamesoft.gameprovider.entity.GameSoftGameProvider;
-import com.security.spring.gamesoft.wager.entity.GameSoftWager;
-import com.security.spring.gamesoft.wager.repository.GameSoftWagerReop;
-import com.security.spring.gamesoft.wager.service.GameSoftWagerService;
+import com.security.spring.thirdpartygames.callback.dto.CallBackTransaction;
+import com.security.spring.thirdpartygames.gameType.entity.GameType;
+import com.security.spring.thirdpartygames.gameprovider.entity.GameSoftGameProvider;
+import com.security.spring.thirdpartygames.wager.entity.GameSoftWager;
+import com.security.spring.thirdpartygames.wager.repository.GameSoftWagerReop;
+import com.security.spring.thirdpartygames.wager.service.GameSoftWagerService;
 import com.security.spring.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -3,7 +3,7 @@ package com.security.spring.utils;
 import com.security.spring.commission.dto.CommissionObj;
 import com.security.spring.commission.entity.UserCommission;
 import com.security.spring.commission.repo.UserCommissionRepo;
-import com.security.spring.gamesoft.transaction.entity.GameSoftTransaction;
+import com.security.spring.thirdpartygames.transaction.entity.GameSoftTransaction;
 import com.security.spring.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

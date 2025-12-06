@@ -1,8 +1,8 @@
 package com.security.spring.exceptionall;
 
-import com.security.spring.gamesoft.callback.dto.GetBalanceCallBackResponse;
-import com.security.spring.gamesoft.callback.dto.PushBetResponse;
-import com.security.spring.gamesoft.callback.dto.Response;
+import com.security.spring.thirdpartygames.callback.dto.GetBalanceCallBackResponse;
+import com.security.spring.thirdpartygames.callback.dto.PushBetResponse;
+import com.security.spring.thirdpartygames.callback.dto.Response;
 import com.security.spring.utils.ResponseCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

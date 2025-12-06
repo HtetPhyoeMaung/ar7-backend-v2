@@ -117,6 +117,8 @@ public class AuthenticationService {
                         .build();
 
                 if (registerRequest.getPromoCode()!=null){
+                    userRepository.findByPromoCode(registerRequest.getPromoCode())
+                            .orElseThrow(()-> new DataNotFoundException("Promo Code မှားယွင်းနေပါသည်!"));
                     user.setPromoCode(registerRequest.getPromoCode());
                 }
                 password = registerRequest.getPassword();

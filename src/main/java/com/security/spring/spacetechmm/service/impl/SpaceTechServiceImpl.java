@@ -5,7 +5,7 @@ import com.security.spring.dashboard.dto.GameRequest;
 import com.security.spring.exceptionall.CustomAlreadyExistException;
 import com.security.spring.exceptionall.DataNotFoundException;
 import com.security.spring.exceptionall.UnauthorizedException;
-import com.security.spring.gamesoft.gameType.service.GameTypeService;
+import com.security.spring.thirdpartygames.gameType.service.GameTypeService;
 import com.security.spring.spacetechmm.dto.SpaceTechGameDto;
 import com.security.spring.spacetechmm.entity.SpaceTechGame;
 import com.security.spring.spacetechmm.repo.SpaceTechRepository;

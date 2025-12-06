@@ -1,10 +1,10 @@
 package com.security.spring.utils;
 
-import com.security.spring.gamesoft.callback.dto.CallBackTransaction;
-import com.security.spring.gamesoft.gameType.entity.GameType;
-import com.security.spring.gamesoft.gameprovider.entity.GameSoftGameProvider;
-import com.security.spring.gamesoft.transaction.entity.GameSoftTransaction;
-import com.security.spring.gamesoft.wager.entity.GameSoftWager;
+import com.security.spring.thirdpartygames.callback.dto.CallBackTransaction;
+import com.security.spring.thirdpartygames.gameType.entity.GameType;
+import com.security.spring.thirdpartygames.gameprovider.entity.GameSoftGameProvider;
+import com.security.spring.thirdpartygames.transaction.entity.GameSoftTransaction;
+import com.security.spring.thirdpartygames.wager.entity.GameSoftWager;
 import com.security.spring.notification.dto.NotificationResponse;
 import com.security.spring.notification.entity.Notification;
 import com.security.spring.user.entity.User;

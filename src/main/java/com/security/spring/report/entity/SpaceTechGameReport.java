@@ -1,6 +1,6 @@
 package com.security.spring.report.entity;
 
-import com.security.spring.gamesoft.gameType.entity.GameType;
+import com.security.spring.thirdpartygames.gameType.entity.GameType;
 import jakarta.persistence.*;
 import lombok.*;
 

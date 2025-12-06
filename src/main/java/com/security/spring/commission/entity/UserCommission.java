@@ -1,12 +1,11 @@
 package com.security.spring.commission.entity;
 
-import com.security.spring.gamesoft.gameType.entity.GameType;
+import com.security.spring.thirdpartygames.gameType.entity.GameType;
 import com.security.spring.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Data

@@ -1,7 +1,7 @@
 package com.security.spring.commission.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.security.spring.gamesoft.gameType.dto.GameTypeObj;
+import com.security.spring.thirdpartygames.gameType.dto.GameTypeObj;
 import com.security.spring.user.dto.UserResponseObj;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

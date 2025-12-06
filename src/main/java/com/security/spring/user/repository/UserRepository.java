@@ -31,5 +31,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Page<User> findByPromoCode(String code, Pageable pageable);
 
+    Optional<User> findByPromoCode(String code);
+
     Page<User> findByPromoCodeAndAndAr7IdContainingIgnoreCase(String code, String searchData, Pageable pageable);
 }

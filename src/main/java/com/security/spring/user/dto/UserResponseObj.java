@@ -25,6 +25,7 @@ public class UserResponseObj {
     private String profileImage;
     private boolean userStatus;
     private UserUnits userUnits;
+    private String code;
 //    private CommissionRe userComession;
     private String secretCode;
     private String parentUserId;

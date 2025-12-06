@@ -238,6 +238,7 @@ public class UserServiceImpl implements UserService{
                .role(returnUser.getRole())
                .lastLoginTime(returnUser.getLoginTime())
                .profileImage(null)
+               .code(returnUser.getCode())
                .userStatus(returnUser.getStatus())
                .userUnits(returnUser.getUserUnits())
                .parentUserId(returnUser.getParentUserId())

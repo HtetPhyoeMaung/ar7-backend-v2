@@ -7,6 +7,7 @@ import com.security.spring.exceptionall.UnauthorizedException;
 import com.security.spring.notification.dto.NotificationResponse;
 import com.security.spring.notification.entity.Notification;
 import com.security.spring.notification.repository.NotificationRepo;
+import com.security.spring.commission.repo.UserCommissionRepo;
 import com.security.spring.promotion.dto.TicketBoxResponse;
 import com.security.spring.promotion.entity.TicketBox;
 import com.security.spring.report.dto.UserReportObj;
@@ -29,9 +30,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -42,6 +46,7 @@ public class UserServiceImpl implements UserService{
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final NotificationRepo notificationRepo;
     private final UserDetailReportService userDetailReportService;
+    private final UserCommissionRepo userCommissionRepo;
 
     @Override
     @Transactional
@@ -113,6 +118,22 @@ public class UserServiceImpl implements UserService{
                         .outlierValue(ticketBox.getOutlierValue())
                         .build();
                 userResponseObj.setTicketBoxResponse(ticketBoxResponse);
+            }
+            if(role.equals(Role.AFFILIATEAGENT)){
+                userResponseObj.setCode(data.getCode());
+                LocalDate today = LocalDate.now();
+                LocalDateTime thisMonthStart = today.with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay();
+                LocalDateTime thisMonthEnd = today.with(TemporalAdjusters.lastDayOfMonth()).atTime(LocalTime.MAX);
+
+                LocalDateTime lastMonthStart = today.minusMonths(1).with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay();
+                LocalDateTime lastMonthEnd = thisMonthStart.minusNanos(1);
+
+                userResponseObj.setWinLoseAmountThisMonth(
+                        calculateAffiliateWinLoseAmount(data, thisMonthStart, thisMonthEnd)
+                );
+                userResponseObj.setWinLoseAmountLastMonth(
+                        calculateAffiliateWinLoseAmount(data, lastMonthStart, lastMonthEnd)
+                );
             }
             return userResponseObj;
         });
@@ -512,6 +533,46 @@ public class UserServiceImpl implements UserService{
         }else{
             throw new DataNotFoundException("Your Parent User was temporatory ban");
         }
+    }
+
+    private double calculateAffiliateWinLoseAmount(User affiliateAgent, LocalDateTime startDate, LocalDateTime endDate) {
+        if (affiliateAgent.getCode() == null) {
+            return 0;
+        }
+
+        Map<Integer, Double> commissionByGameType = getCommissionPercentageMap(affiliateAgent.getAr7Id());
+        List<User> referredUsers = userRepo.findByPromoCode(affiliateAgent.getCode(), Pageable.unpaged()).getContent();
+        if (referredUsers.isEmpty()) {
+            return 0;
+        }
+
+        return referredUsers.stream()
+                .mapToDouble(user -> calculateWinLoseForUser(user.getAr7Id(), commissionByGameType, startDate, endDate))
+                .sum();
+    }
+
+    private Map<Integer, Double> getCommissionPercentageMap(String affiliateAr7Id) {
+        Map<Integer, Double> commissionMap = new HashMap<>();
+        userCommissionRepo.findByUser_ar7Id(affiliateAr7Id).forEach(commission ->
+                commissionMap.put(commission.getGameType().getId(), (double) commission.getCommission())
+        );
+        return commissionMap;
+    }
+
+    private double calculateWinLoseForUser(String ar7Id, Map<Integer, Double> commissionByGameType, LocalDateTime startDate, LocalDateTime endDate) {
+        var userDetailReport = userDetailReportService.getUserDetailReportByAr7Id(ar7Id, startDate, endDate);
+        if (userDetailReport == null || userDetailReport.getUserReportObjList() == null) {
+            return 0;
+        }
+
+        return userDetailReport.getUserReportObjList()
+                .stream()
+                .mapToDouble(reportObj -> {
+                    double commissionPercentage = commissionByGameType.getOrDefault(reportObj.getGameTypeId(), 0.0);
+                    double loseMinusWin = reportObj.getTotalBetAmount() - reportObj.getTotalWinAmount();
+                    return (loseMinusWin / 100) * commissionPercentage;
+                })
+                .sum();
     }
 
 }

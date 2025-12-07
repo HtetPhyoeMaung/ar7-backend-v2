@@ -30,5 +30,7 @@ public class UserResponseObj {
     private String secretCode;
     private String parentUserId;
     private double winLoseAmount;
+    private double winLoseAmountThisMonth;
+    private double winLoseAmountLastMonth;
     private TicketBoxResponse ticketBoxResponse;
 }

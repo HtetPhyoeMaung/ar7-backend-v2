@@ -1,5 +1,6 @@
 package com.security.spring.gamebank.service.impl;
 
+import com.security.spring.exceptionall.DataAlreadyExistException;
 import com.security.spring.gamebank.dto.GameBankBalanceResponse;
 import com.security.spring.gamebank.dto.GameBankResultResponse;
 import com.security.spring.gamebank.model.GameBankSetting;
@@ -80,7 +81,7 @@ public class GameBankService implements IGameBankService {
 
         gameSoftTransactionRepo.findBySpinId(gameBankResultRequest.getSpinId())
                 .ifPresent(tx -> {
-                    throw new ApiDuplicateTransaction("Duplicate Spin Id");
+                    throw new DataAlreadyExistException("Duplicate Spin Id");
                 });
 
         double beforeBalance = user.getUserUnits().getMainUnit();

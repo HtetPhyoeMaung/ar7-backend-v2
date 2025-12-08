@@ -30,6 +30,8 @@ public class GameBankService implements IGameBankService {
     @Transactional
     public ResponseEntity<GameBankBalanceResponse> getBalance(GameBankBalanceRequest gameBankBalanceRequest) {
 
+        log.info("Received Get Balance Call Back Success.");
+
         // retrieve User by playerId
         User user = userRepository.findByAr7Id(gameBankBalanceRequest.getPlayerId())
                 .orElseThrow(()->

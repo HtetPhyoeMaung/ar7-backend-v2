@@ -59,7 +59,7 @@ public class SecurityConfiguration {
                         "/api/test/**",
                          "/download/**",
                          "/api/v1/shan/**"
-                         ,"/api/v1/buffalo/seamless/**"
+                         ,"/api/v1/game-bank/seamless/**"
 //                        "/api/v1/gt/**",
 //                        "/api/v1/gameproduct/**"
                         ).permitAll()

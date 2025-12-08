@@ -1,7 +1,8 @@
-package com.security.spring.buffalo.model;
+package com.security.spring.gamebank.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.*;
 
 @Getter
@@ -10,7 +11,8 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @Entity
-public class BuffaloSetting {
+@Table(name = "game_bank_setting")
+public class GameBankSetting {
     @Id
     private long id;
 

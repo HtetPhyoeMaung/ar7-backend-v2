@@ -1,4 +1,4 @@
-package com.security.spring.buffalo.dto;
+package com.security.spring.gamebank.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

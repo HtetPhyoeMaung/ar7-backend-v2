@@ -49,6 +49,7 @@ public class GameSoftTransaction {
     @ToString.Exclude
     private GameType gameType;
     private String transactionId;
+    private String spinId;
     private boolean isCommissionCalculate;
     private String action;
     private double amount;

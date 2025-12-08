@@ -1,8 +1,5 @@
-package com.security.spring.buffalo.param;
+package com.security.spring.gamebank.param;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 @Data

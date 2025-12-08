@@ -1,10 +1,10 @@
-package com.security.spring.buffalo.controller;
+package com.security.spring.gamebank.controller;
 
-import com.security.spring.buffalo.dto.GameBankBalanceResponse;
-import com.security.spring.buffalo.dto.GameBankResultResponse;
-import com.security.spring.buffalo.param.GameBankBalanceRequest;
-import com.security.spring.buffalo.param.GameBankResultRequest;
-import com.security.spring.buffalo.service.IGameBankService;
+import com.security.spring.gamebank.dto.GameBankBalanceResponse;
+import com.security.spring.gamebank.dto.GameBankResultResponse;
+import com.security.spring.gamebank.param.GameBankBalanceRequest;
+import com.security.spring.gamebank.param.GameBankResultRequest;
+import com.security.spring.gamebank.service.IGameBankService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

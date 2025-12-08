@@ -15,6 +15,7 @@ import java.util.Optional;
 @Repository
 public interface GameSoftTransactionRepo extends JpaRepository<GameSoftTransaction, Long> {
     Optional<GameSoftTransaction> findByTransactionId(String transactionID);
+    Optional<GameSoftTransaction> findBySpinId(String spinId);
 
 //    Optional<GameSoftTransaction> findByTransactionKey(String key);
 

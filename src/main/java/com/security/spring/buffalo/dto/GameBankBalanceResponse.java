@@ -1,20 +1,18 @@
 package com.security.spring.buffalo.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.http.ResponseEntity;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class BuffaloBalanceDto {
+public class GameBankBalanceResponse {
 
     private String agentCode;
 
@@ -22,8 +20,8 @@ public class BuffaloBalanceDto {
 
     private double balance;
 
-    public static BuffaloBalanceDto of(String ar7Id, String agentCode, double balance) {
-        return BuffaloBalanceDto.builder()
+    public static GameBankBalanceResponse of(String ar7Id, String agentCode, double balance) {
+        return GameBankBalanceResponse.builder()
                 .playerId(ar7Id)
                 .agentCode(agentCode)
                 .balance(balance)

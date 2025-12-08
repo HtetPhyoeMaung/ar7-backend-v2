@@ -20,7 +20,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "https://ar7.org/",
                         "http://localhost:4200",
                         "https://ar7myanmar.com/",
-                        "https://staging.gsimw.com/"
+                        "https://staging.gsimw.com/",
+                        "http://139.59.116.137:8080"
                 )   
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*")

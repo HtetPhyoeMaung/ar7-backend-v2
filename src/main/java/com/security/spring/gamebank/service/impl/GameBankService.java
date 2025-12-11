@@ -95,7 +95,7 @@ public class GameBankService implements IGameBankService {
                 .beforeBalance(beforeBalance)
                 .afterBalance(afterBalance)
                 .gameSoftTransitionUser(user)
-                .status("SUCCESS")
+                .status("SETTLED")
                 .createdOn(LocalDateTime.now())
                 .build();
 

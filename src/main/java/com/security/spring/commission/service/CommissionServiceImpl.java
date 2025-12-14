@@ -551,6 +551,9 @@ public class CommissionServiceImpl implements CommissionService {
             return checkUser.getRole().equals(Role.MASTER);
         } else if (user.getRole().equals(Role.MASTER)) {
             return checkUser.getRole().equals(Role.AGENT);
+        } else if (user.getRole().equals(Role.AGENT)) {
+            // Allow agents to manage their affiliate agents directly
+            return checkUser.getRole().equals(Role.AFFILIATEAGENT);
         } else {
             return false;
         }

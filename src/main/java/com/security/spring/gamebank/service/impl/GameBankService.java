@@ -1,6 +1,5 @@
 package com.security.spring.gamebank.service.impl;
 
-import com.security.spring.exceptionall.DataAlreadyExistException;
 import com.security.spring.gamebank.dto.GameBankBalanceResponse;
 import com.security.spring.gamebank.dto.GameBankResultResponse;
 import com.security.spring.gamebank.model.GameBankSetting;
@@ -11,8 +10,6 @@ import com.security.spring.gamebank.service.IGameBankService;
 import com.security.spring.exceptionall.DataNotFoundException;
 import com.security.spring.exceptionall.ApiDuplicateTransaction;
 import com.security.spring.exceptionall.UnauthorizedException;
-import com.security.spring.thirdpartygames.gameType.entity.GameType;
-import com.security.spring.thirdpartygames.gameType.repo.GameTypeRepo;
 import com.security.spring.thirdpartygames.transaction.entity.GameSoftTransaction;
 import com.security.spring.thirdpartygames.transaction.repsitory.GameSoftTransactionRepo;
 import com.security.spring.user.entity.User;
@@ -33,7 +30,6 @@ public class GameBankService implements IGameBankService {
     private final UserRepository userRepository;
     private final GameBankSettingRepo gameBankSettingRepo;
     private final GameSoftTransactionRepo gameSoftTransactionRepo;
-    private final GameTypeRepo gameTypeRepo;
 
 
     @Override
@@ -49,7 +45,7 @@ public class GameBankService implements IGameBankService {
                                 + gameBankBalanceRequest.getPlayerId()));
 
         GameBankSetting gameBankSetting = gameBankSettingRepo.findAll().stream()
-                .findFirst()
+                .filter(setting -> setting.getId()==1).findFirst()
                 .orElseThrow(()-> new DataNotFoundException("Default Game Bank Setting Not Found!"));
 
         if (!gameBankBalanceRequest.getAgentCode().equals(gameBankSetting.getAgentCode()) ||
@@ -71,28 +67,25 @@ public class GameBankService implements IGameBankService {
         log.info("Game Bank Request : {}",gameBankResultRequest);
 
         GameBankSetting gameBankSetting = gameBankSettingRepo.findAll().stream()
-                .findFirst()
+                .filter(setting -> setting.getId()==1).findFirst()
                 .orElseThrow(() -> new DataNotFoundException("Default Game Bank Setting Not Found!"));
 
         if (!gameBankSetting.getAgentCode().equals(gameBankResultRequest.getAgentCode())){
             throw new UnauthorizedException("You're Unauthorized!");
         }
 
-        User user = userRepository.findByAr7Id(gameBankResultRequest.getUserId())
+        User user = userRepository.findByAr7Id(gameBankResultRequest.getUserId().toString())
                 .orElseThrow(() -> new DataNotFoundException("User Not Found By Player Id : "
                         + gameBankResultRequest.getUserId()));
 
         gameSoftTransactionRepo.findBySpinId(gameBankResultRequest.getSpinId())
                 .ifPresent(tx -> {
-                    throw new DataAlreadyExistException("Duplicate Spin Id");
+                    throw new ApiDuplicateTransaction("Duplicate Spin Id");
                 });
 
         double beforeBalance = user.getUserUnits().getMainUnit();
         double afterBalance = (beforeBalance - gameBankResultRequest.getBetAmount()) + gameBankResultRequest.getPayout();
         user.getUserUnits().setMainUnit(afterBalance);
-
-        GameType gameType = gameTypeRepo.findByCode("SLOT")
-                .orElseThrow(()-> new DataNotFoundException("Game Type not found by Code : "+"SLOT"));
 
         GameSoftTransaction transaction = GameSoftTransaction.builder()
                 .spinId(gameBankResultRequest.getSpinId())
@@ -101,9 +94,8 @@ public class GameBankService implements IGameBankService {
                 .beforeBalance(beforeBalance)
                 .afterBalance(afterBalance)
                 .gameSoftTransitionUser(user)
-                .status("SETTLED")
+                .status("SUCCESS")
                 .createdOn(LocalDateTime.now())
-                .gameType(gameType)
                 .build();
 
         gameSoftTransactionRepo.save(transaction);

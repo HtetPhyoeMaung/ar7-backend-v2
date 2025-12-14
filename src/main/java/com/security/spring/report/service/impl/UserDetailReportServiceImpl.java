@@ -100,8 +100,12 @@ public class UserDetailReportServiceImpl implements UserDetailReportService {
     @Override
     public ResponseEntity<UserDetailsResponse> getUserDetailReport(String token, UserPlayDetailTransitionGroupKey request,Pageable pageable) {
         String ar7Id = jwtService.extractUsername(token.substring(7));
-        if(!ar7Id.startsWith("AY")){
-            throw new UnauthorizedException("You are not admin");
+        if(!ar7Id.startsWith("AY") 
+        || !ar7Id.startsWith("AG") 
+        || !ar7Id.startsWith("MS") 
+        || !ar7Id.startsWith("SE")
+        || !ar7Id.startsWith("AFFILIATEAGENT") ){
+            throw new UnauthorizedException("You are not authorized to access this resource");
         }
 
         Page<GameSoftTransaction> gameSoftTransactionPage = gameSoftTransactionRepo.findByCreatedOnBetweenAndGameSoftTransitionUser_Ar7IdAndGameType_IdAndStatus(DateUitls.parseDateTime(request.getStartDate()),DateUitls.parseDateTime(request.getEndDate()),request.getAr7Id(),request.getGameTypeId(),"SETTLED",pageable);

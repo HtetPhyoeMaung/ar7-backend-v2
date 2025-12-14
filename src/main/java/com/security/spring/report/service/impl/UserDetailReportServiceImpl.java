@@ -190,10 +190,12 @@ public class UserDetailReportServiceImpl implements UserDetailReportService {
                      .transactionId(e.getTransactionId())
                      .wagerId(e.getGameSoftWager() != null ? Long.valueOf(e.getGameSoftWager().getId()) : null)
                      .gameCode(e.getGameCode())
-                     .beforeBetAmount(e.getBetAmount())
+                     // reflect balance before and after the bet, not just the stake
+                     .beforeBetAmount(e.getBeforeBalance())
                      .betAmount(e.getBetAmount())
                      .winAmount(e.getAmount() >= 0 ? e.getAmount() : 0.0)
                      .transactionAmount(e.getAmount())
+                     .afterAmount(e.getAfterBalance())
                      .status(e.getStatus())
                      .gameName(e.getGameType() != null ? e.getGameType().getDescription() : null)
                      .gameTypeCode(e.getGameType() != null ? e.getGameType().getCode() : null)

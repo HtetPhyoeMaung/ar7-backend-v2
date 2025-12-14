@@ -100,11 +100,13 @@ public class UserDetailReportServiceImpl implements UserDetailReportService {
     @Override
     public ResponseEntity<UserDetailsResponse> getUserDetailReport(String token, UserPlayDetailTransitionGroupKey request,Pageable pageable) {
         String ar7Id = jwtService.extractUsername(token.substring(7));
-        if(!ar7Id.startsWith("AY") 
-        || !ar7Id.startsWith("AG") 
-        || !ar7Id.startsWith("MS") 
-        || !ar7Id.startsWith("SE")
-        || !ar7Id.startsWith("AFFILIATEAGENT") ){
+        // Allow only Admin, Agent, Master, Senior Master, Affiliate Agent
+        boolean isAllowedRole = ar7Id.startsWith("AY")
+                || ar7Id.startsWith("AG")
+                || ar7Id.startsWith("MS")
+                || ar7Id.startsWith("SE")
+                || ar7Id.startsWith("AFG");
+        if (!isAllowedRole) {
             throw new UnauthorizedException("You are not authorized to access this resource");
         }
 

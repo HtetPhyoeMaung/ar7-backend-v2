@@ -114,6 +114,8 @@ public class GetGameListServiceImpl implements GetGameListService {
         	                requestEntity,
         	                GameBankResponse.class
         	        );
+        	log.info("RAW GAMEBANK RESPONSE = {}", gameBankResponse.getBody());
+
         	
         	ObjectMapper mapper = new ObjectMapper();
 

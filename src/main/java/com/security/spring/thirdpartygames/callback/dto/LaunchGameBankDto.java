@@ -17,11 +17,11 @@ public class LaunchGameBankDto {
     private String displayName;
     private double balance;
 
-    public static LaunchGameBankDto of(String memberName, String displayName, double mainUnit) {
+    public static LaunchGameBankDto of(String agentId, String agentPassword,String gameCode, String memberName, String displayName, double mainUnit) {
         return LaunchGameBankDto.builder()
-                .agentId("QJFDkw7P")
-                .agentPassword("51ac6d7e-c857-48c5-bf30-fcf837d40223")
-                .gameCode("b001")
+                .agentId(agentId)
+                .agentPassword(agentPassword)
+                .gameCode(gameCode)
                 .userName(memberName)
                 .displayName(displayName)
                 .balance(mainUnit)

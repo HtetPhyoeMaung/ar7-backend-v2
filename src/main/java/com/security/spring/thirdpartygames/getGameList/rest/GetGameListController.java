@@ -1,5 +1,7 @@
 package com.security.spring.thirdpartygames.getGameList.rest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.security.spring.config.JWTService;
 import com.security.spring.thirdpartygames.getGameList.dto.GetGameListRequest;
 import com.security.spring.thirdpartygames.getGameList.dto.GetGameListResponse;
@@ -26,7 +28,7 @@ public class GetGameListController {
     private final GetGameListService getGameListService;
 
     @PostMapping("/getgamelist")
-    public ResponseEntity<GetGameListResponse> getGameList(@RequestBody GetGameListRequest data) {
+    public ResponseEntity<GetGameListResponse> getGameList(@RequestBody GetGameListRequest data) throws JsonMappingException, JsonProcessingException {
         String ar7Id = ContextUtils.getAr7IdFromContext();
 
         GetGameListResponse response = getGameListService.getGameListConfig(data, ar7Id);

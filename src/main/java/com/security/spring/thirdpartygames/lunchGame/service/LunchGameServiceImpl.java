@@ -3,6 +3,8 @@ package com.security.spring.thirdpartygames.lunchGame.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.security.spring.exceptionall.DataNotFoundException;
+import com.security.spring.gamebank.model.GameBankSetting;
+import com.security.spring.gamebank.repo.GameBankSettingRepo;
 import com.security.spring.thirdpartygames.callback.dto.GameBankResponse;
 import com.security.spring.thirdpartygames.callback.dto.LaunchGameBankDto;
 import com.security.spring.thirdpartygames.gameType.entity.GameType;
@@ -44,6 +46,8 @@ public class LunchGameServiceImpl implements LunchGameService{
     private final GameProviderRepo gameProviderRepo;
 
     private final MemberSignService memberSignService;
+    
+    private final GameBankSettingRepo gameBankSettingRepo;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
@@ -57,7 +61,7 @@ public class LunchGameServiceImpl implements LunchGameService{
 
     private String apiUrl = constantDataObj.getApiUrl();
     private String thirdPartyRoute = apiUrl+"/api/operators/launch-game";
-    private String gameBankRoute = constantDataObj.getGameBankUrl() + "/api/buffalo/v1/system/access";
+    private String gameBankRoute;
     private String sign;
     private String requestTime;
     private String methodName = "launchgame";
@@ -112,7 +116,11 @@ public class LunchGameServiceImpl implements LunchGameService{
         System.out.println("Lunch Game Request " + requestObj);
         ResponseEntity<LunchGameResponse> response;
         if (data.getProductID()==2026){
-            LaunchGameBankDto launchGameBankDto = LaunchGameBankDto.of(memberName,displayName,userObj.getUserUnits().getMainUnit());
+            GameBankSetting gameBankSetting = gameBankSettingRepo.findAll().stream()
+                    .filter(setting -> setting.getId()==1).findFirst()
+                    .orElseThrow(()-> new DataNotFoundException("Default Game Bank Setting Not Found!"));
+            gameBankRoute = gameBankSetting.getCallBackUrl() + "/api/buffalo/v1/system/access";
+            LaunchGameBankDto launchGameBankDto = LaunchGameBankDto.of(gameBankSetting.getAgentId(), gameBankSetting.getPassword(),data.getGameID(), memberName,displayName,userObj.getUserUnits().getMainUnit());
             HttpEntity<LaunchGameBankDto> gameBankRequestBody = new HttpEntity<>(launchGameBankDto,headers);
             ResponseEntity<GameBankResponse> gameBankResponse = restTemplate.exchange(gameBankRoute, HttpMethod.POST, gameBankRequestBody,
                     new ParameterizedTypeReference<GameBankResponse>() {

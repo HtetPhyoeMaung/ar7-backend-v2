@@ -1,5 +1,7 @@
 package com.security.spring.thirdpartygames.getGameList.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +14,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(content = Include.NON_NULL)
 public class GameListResponse {
 
     @JsonProperty("provider_games")

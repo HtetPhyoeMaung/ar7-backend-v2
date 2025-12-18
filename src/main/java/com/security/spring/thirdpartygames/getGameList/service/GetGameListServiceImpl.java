@@ -1,7 +1,14 @@
 package com.security.spring.thirdpartygames.getGameList.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.security.spring.exceptionall.ApiMemberDoesNotExist;
 import com.security.spring.exceptionall.DataNotFoundException;
+import com.security.spring.gamebank.model.GameBankSetting;
+import com.security.spring.gamebank.repo.GameBankSettingRepo;
+import com.security.spring.thirdpartygames.callback.dto.GameBankResponse;
 import com.security.spring.thirdpartygames.gameType.entity.GameType;
 import com.security.spring.thirdpartygames.gameType.repo.GameTypeRepo;
 import com.security.spring.thirdpartygames.gameprovider.entity.GameSoftGameProvider;
@@ -9,6 +16,7 @@ import com.security.spring.thirdpartygames.gameprovider.repository.GameProviderR
 import com.security.spring.thirdpartygames.getGameList.dto.GameListResponse;
 import com.security.spring.thirdpartygames.getGameList.dto.GetGameListRequest;
 import com.security.spring.thirdpartygames.getGameList.dto.GetGameListResponse;
+import com.security.spring.thirdpartygames.getGameList.dto.ProviderGame;
 import com.security.spring.spacetechmm.service.SpaceTechService;
 import com.security.spring.user.entity.User;
 import com.security.spring.user.repository.UserRepository;
@@ -17,6 +25,11 @@ import com.security.spring.utils.ErrorMessageUtil;
 import com.security.spring.utils.SignUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +39,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -41,6 +55,8 @@ public class GetGameListServiceImpl implements GetGameListService {
     private final GameTypeRepo gameTypeRepo;
 
     private final GameProviderRepo gameProviderRepo;
+    
+    private final GameBankSettingRepo gameBankSettingRepo;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
@@ -56,7 +72,7 @@ public class GetGameListServiceImpl implements GetGameListService {
 
     @Override
     @Transactional
-    public GetGameListResponse getGameListConfig(GetGameListRequest data, String ar7id) {
+    public GetGameListResponse getGameListConfig(GetGameListRequest data, String ar7id) throws JsonMappingException, JsonProcessingException {
         User currentUser = userRepository.findByAr7Id(ar7id).orElseThrow(() -> new ApiMemberDoesNotExist(ErrorMessageUtil.API_MEMBER_NOT_EXISTS));
         String memberName = currentUser.getAr7Id();
         String displayName = currentUser.getName();
@@ -75,9 +91,41 @@ public class GetGameListServiceImpl implements GetGameListService {
 
         log.info("Get Game List Request URI: {}", uri);
         ResponseEntity<GameListResponse> response;
+        ResponseEntity<GameBankResponse> gameBankResponse;
 
-        if (data.getProductID() == 2026){
-             response = ResponseEntity.ok(new GameListResponse());
+        if (data.getProductID() == 2026) {
+        	GameBankSetting gameBankSetting = gameBankSettingRepo.findAll().stream()
+                .filter(setting -> setting.getId()==1).findFirst()
+                .orElseThrow(()-> new DataNotFoundException("Default Game Bank Setting Not Found!"));
+        	HttpHeaders headers = new HttpHeaders();
+        	headers.setContentType(MediaType.APPLICATION_JSON);
+
+        	HttpEntity<GetGameListRequest> requestEntity =
+        	        new HttpEntity<>(GetGameListRequest.builder()
+        	                .agentId(gameBankSetting.getAgentId())
+        	                .agentCode(gameBankSetting.getAgentCode())
+        	                .build(), headers);
+
+        	gameBankResponse =
+        	        restTemplate.exchange(
+        	                gameBankSetting.getCallBackUrl() + "/api/game/v1/games",
+        	                HttpMethod.POST,
+        	                requestEntity,
+        	                GameBankResponse.class
+        	        );
+        	
+        	ObjectMapper mapper = new ObjectMapper();
+
+
+			List<ProviderGame> providerGames = mapper.readValue(
+			        gameBankResponse.getBody().getData(),
+			        new TypeReference<List<ProviderGame>>() {}
+			);
+			
+			response = ResponseEntity.ok(GameListResponse.builder()
+					.providerGames(providerGames)
+					.build());
+        	
         } else {
             // Send GET request
             response= restTemplate.getForEntity(uri, GameListResponse.class);

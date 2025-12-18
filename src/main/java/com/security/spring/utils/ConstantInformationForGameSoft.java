@@ -12,8 +12,7 @@ import lombok.NoArgsConstructor;
 public class ConstantInformationForGameSoft {
     @Builder.Default
     private String apiUrl = "https://production.gsimw.com/";
-    @Builder.Default
-    private String gameBankUrl = "http://139.59.116.137:8080/";
+
     @Builder.Default
     private String operatorCode = "N5I1";
     @Builder.Default

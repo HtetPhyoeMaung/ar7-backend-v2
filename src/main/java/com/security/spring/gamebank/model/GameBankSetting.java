@@ -15,6 +15,8 @@ import lombok.*;
 public class GameBankSetting {
     @Id
     private long id;
+    
+    private String agentId;
 
     private String agentCode;
 

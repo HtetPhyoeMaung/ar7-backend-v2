@@ -105,6 +105,7 @@ public class GetGameListServiceImpl implements GetGameListService {
         	                .agentId(gameBankSetting.getAgentId())
         	                .agentCode(gameBankSetting.getAgentCode())
         	                .build(), headers);
+        	log.info("agent id {} , agentCode {}",gameBankSetting.getAgentId(),gameBankSetting.getAgentCode());
 
         	gameBankResponse =
         	        restTemplate.exchange(

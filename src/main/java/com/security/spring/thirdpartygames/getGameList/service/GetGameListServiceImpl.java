@@ -3,6 +3,7 @@ package com.security.spring.thirdpartygames.getGameList.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.security.spring.exceptionall.ApiMemberDoesNotExist;
 import com.security.spring.exceptionall.DataNotFoundException;
@@ -91,7 +92,7 @@ public class GetGameListServiceImpl implements GetGameListService {
 
         log.info("Get Game List Request URI: {}", uri);
         ResponseEntity<GameListResponse> response;
-        ResponseEntity<GameBankResponse> gameBankResponse;
+        ResponseEntity<String> rawResponse;
 
         if (data.getProductID() == 2026) {
         	GameBankSetting gameBankSetting = gameBankSettingRepo.findAll().stream()
@@ -107,23 +108,23 @@ public class GetGameListServiceImpl implements GetGameListService {
         	                .build(), headers);
         	log.info("agent id {} , agentCode {}",gameBankSetting.getAgentId(),gameBankSetting.getAgentCode());
 
-        	gameBankResponse =
+        	rawResponse =
         	        restTemplate.exchange(
         	                gameBankSetting.getCallBackUrl() + "/api/game/v1/games",
         	                HttpMethod.POST,
         	                requestEntity,
-        	                GameBankResponse.class
+        	                String.class
         	        );
-        	log.info("RAW GAMEBANK RESPONSE = {}", gameBankResponse.getBody());
+        	log.info("RAW GAMEBANK RESPONSE = {}", rawResponse.getBody());
 
         	
         	ObjectMapper mapper = new ObjectMapper();
 
 
-			List<ProviderGame> providerGames = mapper.readValue(
-			        gameBankResponse.getBody().getData(),
-			        new TypeReference<List<ProviderGame>>() {}
-			);
+        	JsonNode node = mapper.readTree(rawResponse.getBody());
+        	JsonNode dataNode = node.get("data");
+        	List<ProviderGame> providerGames =
+        	        mapper.convertValue(dataNode, new TypeReference<List<ProviderGame>>() {});
 			
 			response = ResponseEntity.ok(GameListResponse.builder()
 					.providerGames(providerGames)

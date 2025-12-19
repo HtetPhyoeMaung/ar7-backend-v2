@@ -120,7 +120,7 @@ public class LunchGameServiceImpl implements LunchGameService{
                     .filter(setting -> setting.getId()==1).findFirst()
                     .orElseThrow(()-> new DataNotFoundException("Default Game Bank Setting Not Found!"));
             gameBankRoute = gameBankSetting.getCallBackUrl() + "/api/buffalo/v1/system/access";
-            LaunchGameBankDto launchGameBankDto = LaunchGameBankDto.of(gameBankSetting.getAgentId(), gameBankSetting.getPassword(),data.getGameID(), memberName,displayName,userObj.getUserUnits().getMainUnit());
+            LaunchGameBankDto launchGameBankDto = LaunchGameBankDto.of(gameBankSetting.getAgentId(), gameBankSetting.getAgentCode(),data.getGameID(), memberName,displayName,userObj.getUserUnits().getMainUnit());
             HttpEntity<LaunchGameBankDto> gameBankRequestBody = new HttpEntity<>(launchGameBankDto,headers);
             ResponseEntity<GameBankResponse> gameBankResponse = restTemplate.exchange(gameBankRoute, HttpMethod.POST, gameBankRequestBody,
                     new ParameterizedTypeReference<GameBankResponse>() {

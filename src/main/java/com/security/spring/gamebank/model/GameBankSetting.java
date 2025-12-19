@@ -20,7 +20,5 @@ public class GameBankSetting {
 
     private String agentCode;
 
-    private String password;
-
     private String callBackUrl;
 }

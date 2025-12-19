@@ -5,10 +5,10 @@ import lombok.Data;
 @Data
 public class GameBankResultRequest {
     private String agentCode;
-    private String userId;
+    private String agentId;
+    private String playerId;
     private String spinId;
     private double betAmount;
     private double payout;
     private String createdAt;
-
 }

@@ -5,6 +5,7 @@ import com.security.spring.gamebank.dto.GameBankResultResponse;
 import com.security.spring.gamebank.param.GameBankBalanceRequest;
 import com.security.spring.gamebank.param.GameBankResultRequest;
 import com.security.spring.gamebank.service.IGameBankService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class CallBackController {
 
     @PostMapping("/balance")
     public ResponseEntity<GameBankBalanceResponse> getBalance(
-            @RequestBody GameBankBalanceRequest gameBankBalanceRequest
+            @RequestBody @Valid GameBankBalanceRequest gameBankBalanceRequest
     ){
         log.info("Get Balance Call Back Request : {}",gameBankBalanceRequest);
         return gameBankService.getBalance(gameBankBalanceRequest);
@@ -28,7 +29,7 @@ public class CallBackController {
 
     @PostMapping("/result")
     public ResponseEntity<GameBankResultResponse> setResult(
-            @RequestBody GameBankResultRequest gameBankResultRequest
+            @RequestBody @Valid GameBankResultRequest gameBankResultRequest
             ){
         log.info("Result Call Back Request : {}", gameBankResultRequest);
         return gameBankService.setResult(gameBankResultRequest);

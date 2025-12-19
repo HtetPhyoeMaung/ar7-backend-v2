@@ -49,7 +49,7 @@ public class GameBankService implements IGameBankService {
                 .orElseThrow(()-> new DataNotFoundException("Default Game Bank Setting Not Found!"));
 
         if (!gameBankBalanceRequest.getAgentCode().equals(gameBankSetting.getAgentCode()) ||
-        !gameBankBalanceRequest.getPassword().equals(gameBankSetting.getPassword())){
+        !gameBankBalanceRequest.getAgentId().equals(gameBankSetting.getAgentId())){
             throw new UnauthorizedException("You're Unauthorized!");
         }
 
@@ -70,13 +70,14 @@ public class GameBankService implements IGameBankService {
                 .filter(setting -> setting.getId()==1).findFirst()
                 .orElseThrow(() -> new DataNotFoundException("Default Game Bank Setting Not Found!"));
 
-        if (!gameBankSetting.getAgentCode().equals(gameBankResultRequest.getAgentCode())){
+        if (!gameBankSetting.getAgentCode().equals(gameBankResultRequest.getAgentCode())
+        || !gameBankSetting.getAgentId().equals(gameBankResultRequest.getAgentId())){
             throw new UnauthorizedException("You're Unauthorized!");
         }
 
-        User user = userRepository.findByAr7Id(gameBankResultRequest.getUserId().toString())
+        User user = userRepository.findByAr7Id(gameBankResultRequest.getPlayerId().toString())
                 .orElseThrow(() -> new DataNotFoundException("User Not Found By Player Id : "
-                        + gameBankResultRequest.getUserId()));
+                        + gameBankResultRequest.getPlayerId()));
 
         gameSoftTransactionRepo.findBySpinId(gameBankResultRequest.getSpinId())
                 .ifPresent(tx -> {

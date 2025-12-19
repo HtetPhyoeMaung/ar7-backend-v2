@@ -6,12 +6,11 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GameBankBalanceRequest {
     @NotBlank(message = "agent_code must not be null or blank!")
     private String agentCode;
     @NotBlank(message = "password must not be null or blank!")
-    private String password;
+    private String agentId;
     @NotBlank(message = "player_id must not be null or blank!")
     private String playerId;
 }

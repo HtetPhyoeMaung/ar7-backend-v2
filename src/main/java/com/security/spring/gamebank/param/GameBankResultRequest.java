@@ -8,6 +8,9 @@ public class GameBankResultRequest {
     private String agentId;
     private String playerId;
     private String spinId;
+    private String gameType;
+    private String gameCode;
+    private String gameName;
     private double betAmount;
     private double payout;
     private String createdAt;

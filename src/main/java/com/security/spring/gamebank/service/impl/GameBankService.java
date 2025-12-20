@@ -101,6 +101,8 @@ public class GameBankService implements IGameBankService {
                 .beforeBalance(beforeBalance)
                 .afterBalance(afterBalance)
                 .gameType(gameType)
+                .gameCode(gameBankResultRequest.getGameCode()==null?gameBankResultRequest.getGameName():
+                        gameBankResultRequest.getGameCode())
                 .gameSoftTransitionUser(user)
                 .status("SETTLED")
                 .createdOn(LocalDateTime.now())

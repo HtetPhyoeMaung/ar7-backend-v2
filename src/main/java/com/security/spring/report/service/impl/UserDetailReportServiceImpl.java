@@ -66,24 +66,26 @@ public class UserDetailReportServiceImpl implements UserDetailReportService {
 
     private List<UserReportObj> getGroupedUserReportList(List<GameSoftTransaction> gameSoftTransactionPage) {
         return gameSoftTransactionPage.stream().collect(Collectors.groupingBy(
-                        g -> new GameTransactionGroupKey(
-                                g.getGameSoftTransitionUser().getAr7Id(),
-                                g.getGameType().getId()
-                        ),
+                        g -> {
+                            // Guard null game type to avoid NPE during grouping
+                            int gameTypeId = g.getGameType() != null ? g.getGameType().getId() : 1;
+                            String ar7Id = g.getGameSoftTransitionUser().getAr7Id();
+                            return new GameTransactionGroupKey(ar7Id, gameTypeId);
+                        },
                         Collectors.collectingAndThen(
                                 Collectors.toList(),
                                 list -> {
                                     int totalBetAmount = (int) list.stream().mapToDouble(GameSoftTransaction::getBetAmount).sum();
                                     int sumTotalWinAmount = (int) list.stream().mapToDouble(GameSoftTransaction::getAmount).sum();
 
-                                    int winLoseAmount = sumTotalWinAmount-totalBetAmount;
-                                    int totalWinAmount = winLoseAmount+totalBetAmount;
+                                    int winLoseAmount = sumTotalWinAmount - totalBetAmount;
+                                    int totalWinAmount = winLoseAmount + totalBetAmount;
                                     log.info("List Current i , {}", list.get(0));
                                     return UserReportObj.builder()
                                             .userId(list.get(0).getGameSoftTransitionUser().getAr7Id())
-                                            .gameTypeName(list.get(0).getGameType().getDescription())
+                                            .gameTypeName(list.get(0).getGameType() == null ? "စလော့" : list.get(0).getGameType().getDescription())
                                             .totalBetCount(list.size())
-                                            .gameTypeId(list.get(0).getGameType().getId())
+                                            .gameTypeId(list.get(0).getGameType() == null ? 1 : list.get(0).getGameType().getId())
                                             .totalBetAmount(totalBetAmount)
                                             .totalWinAmount(totalWinAmount)
                                             .winLoseAmount(winLoseAmount)

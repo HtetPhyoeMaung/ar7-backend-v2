@@ -10,6 +10,8 @@ import com.security.spring.gamebank.service.IGameBankService;
 import com.security.spring.exceptionall.DataNotFoundException;
 import com.security.spring.exceptionall.ApiDuplicateTransaction;
 import com.security.spring.exceptionall.UnauthorizedException;
+import com.security.spring.thirdpartygames.gameType.entity.GameType;
+import com.security.spring.thirdpartygames.gameType.repo.GameTypeRepo;
 import com.security.spring.thirdpartygames.transaction.entity.GameSoftTransaction;
 import com.security.spring.thirdpartygames.transaction.repsitory.GameSoftTransactionRepo;
 import com.security.spring.user.entity.User;
@@ -30,6 +32,7 @@ public class GameBankService implements IGameBankService {
     private final UserRepository userRepository;
     private final GameBankSettingRepo gameBankSettingRepo;
     private final GameSoftTransactionRepo gameSoftTransactionRepo;
+    private final GameTypeRepo gameTypeRepo;
 
 
     @Override
@@ -88,12 +91,16 @@ public class GameBankService implements IGameBankService {
         double afterBalance = (beforeBalance - gameBankResultRequest.getBetAmount()) + gameBankResultRequest.getPayout();
         user.getUserUnits().setMainUnit(afterBalance);
 
+        GameType gameType = gameTypeRepo.findByCode("SLOT").orElseThrow(()->
+                new DataNotFoundException("Game Type not found by Code : "+"SLOT"));
+
         GameSoftTransaction transaction = GameSoftTransaction.builder()
                 .spinId(gameBankResultRequest.getSpinId())
                 .betAmount(gameBankResultRequest.getBetAmount())
                 .amount(gameBankResultRequest.getPayout())
                 .beforeBalance(beforeBalance)
                 .afterBalance(afterBalance)
+                .gameType(gameType)
                 .gameSoftTransitionUser(user)
                 .status("SETTLED")
                 .createdOn(LocalDateTime.now())

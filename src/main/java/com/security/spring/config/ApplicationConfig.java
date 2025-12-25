@@ -1,5 +1,6 @@
 package com.security.spring.config;
 
+import com.security.spring.user.entity.User;
 import com.security.spring.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+import java.util.Optional;
+
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
@@ -27,8 +31,17 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService(){
-        return userId -> repository.findByAr7Id(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not Found"));
+        return username -> {
+            Optional<User> userByAr7Id = repository.findByAr7Id(username);
+            if (userByAr7Id.isPresent()) {
+                return userByAr7Id.get();
+            }
+            List<User> usersByName = repository.findByName(username);
+            if (usersByName.size() == 1) {
+                return usersByName.get(0);
+            }
+            throw new UsernameNotFoundException("User not Found");
+        };
     }
 
     @Bean

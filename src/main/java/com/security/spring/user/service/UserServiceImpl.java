@@ -2,6 +2,7 @@ package com.security.spring.user.service;
 
 import com.security.spring.change_password.dto.ChangeAr7IdResponse;
 import com.security.spring.exceptionall.CustomAlreadyExistException;
+import com.security.spring.exceptionall.DataAlreadyExistException;
 import com.security.spring.exceptionall.DataNotFoundException;
 import com.security.spring.exceptionall.UnauthorizedException;
 import com.security.spring.notification.dto.NotificationResponse;
@@ -452,6 +453,11 @@ public class UserServiceImpl implements UserService{
             throw new UnauthorizedException("when edit profile , you must edit at least one field.");
         }
         if(request.getName() != null){
+            if (!request.getName().equals(user.getName())) {
+                if (!userRepo.findByName(request.getName()).isEmpty()) {
+                    throw new DataAlreadyExistException("User with name '" + request.getName() + "' already exists.");
+                }
+            }
             user.setName(request.getName());
         }
         if(request.getEmail() != null){

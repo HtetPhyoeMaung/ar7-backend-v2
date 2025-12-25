@@ -14,7 +14,11 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="transition_history")
+@Table(name="transition_history", indexes = {
+        @Index(name = "idx_th_from_user_id", columnList = "from_user_id"),
+        @Index(name = "idx_th_to_user_id", columnList = "to_user_id"),
+        @Index(name = "idx_th_actiontime", columnList = "actionTime")
+})
 public class TransitionHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

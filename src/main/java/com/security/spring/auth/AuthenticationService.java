@@ -61,6 +61,9 @@ public class AuthenticationService {
             if(registerRequest == null){
                 throw new FieldRequireException("register request was required.");
             }
+            if (!repository.findByName(registerRequest.getFullName()).isEmpty()) {
+                throw new DataAlreadyExistException("User with name '" + registerRequest.getFullName() + "' already exists.");
+            }
             parentAr7Id = registerRequest.getParentUserId();
             Role downLineRole = registerRequest.getRole();
             String downLineAr7Id = generateAr7Prefix(downLineRole) + AR7IdGenerate.generateDigit();
@@ -104,6 +107,11 @@ public class AuthenticationService {
                         .build();
                 user = userRepository.save(user);
             }else{
+                if (registerRequest.getFullName() != null && !registerRequest.getFullName().isEmpty()) {
+                    if (!repository.findByName(registerRequest.getFullName()).isEmpty()) {
+                        throw new DataAlreadyExistException("User with name '" + registerRequest.getFullName() + "' already exists.");
+                    }
+                }
                 user = User.builder()
                         .userId(0)
                         .name(registerRequest.getFullName())

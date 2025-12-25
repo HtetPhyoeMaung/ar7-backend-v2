@@ -31,7 +31,14 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "user")
+@Table(name = "user", indexes = {
+        @Index(name = "idx_user_full_name", columnList = "full_name"),
+        @Index(name = "idx_user_role", columnList = "role"),
+        @Index(name = "idx_user_status", columnList = "status"),
+        @Index(name = "idx_user_parentuserid", columnList = "parentUserId"),
+        @Index(name = "idx_user_code", columnList = "code"),
+        @Index(name = "idx_user_promocode", columnList = "promoCode")
+})
 public class User implements UserDetails , Serializable{
 
     @Serial

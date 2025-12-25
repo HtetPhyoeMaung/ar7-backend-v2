@@ -12,7 +12,7 @@ import java.util.*;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByAr7Id(String ar7Id);
-    List<User> findByName(String name);
+    Optional<User> findByName(String name);
     Page<User> findByRole(Role role, Pageable pageable);
     Page<User> findByStatusIsFalse(Pageable pageable);
     Page<User> findByParentUserId(String parentId,Pageable pageable);

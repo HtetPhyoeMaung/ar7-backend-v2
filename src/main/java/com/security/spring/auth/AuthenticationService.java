@@ -61,7 +61,7 @@ public class AuthenticationService {
             if(registerRequest == null){
                 throw new FieldRequireException("register request was required.");
             }
-            if (!repository.findByName(registerRequest.getFullName()).isEmpty()) {
+            if (repository.findByName(registerRequest.getFullName()).isPresent()) {
                 throw new DataAlreadyExistException("User with name '" + registerRequest.getFullName() + "' already exists.");
             }
             parentAr7Id = registerRequest.getParentUserId();
@@ -108,7 +108,7 @@ public class AuthenticationService {
                 user = userRepository.save(user);
             }else{
                 if (registerRequest.getFullName() != null && !registerRequest.getFullName().isEmpty()) {
-                    if (!repository.findByName(registerRequest.getFullName()).isEmpty()) {
+                    if (repository.findByName(registerRequest.getFullName()).isPresent()) {
                         throw new DataAlreadyExistException("User with name '" + registerRequest.getFullName() + "' already exists.");
                     }
                 }

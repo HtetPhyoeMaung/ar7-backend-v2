@@ -36,9 +36,9 @@ public class ApplicationConfig {
             if (userByAr7Id.isPresent()) {
                 return userByAr7Id.get();
             }
-            List<User> usersByName = repository.findByName(username);
-            if (usersByName.size() == 1) {
-                return usersByName.get(0);
+            Optional<User> userByName = repository.findByName(username);
+            if (userByName.isPresent()) {
+                return userByName.get();
             }
             throw new UsernameNotFoundException("User not Found");
         };

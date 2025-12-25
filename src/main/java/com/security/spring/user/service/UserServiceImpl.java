@@ -454,7 +454,7 @@ public class UserServiceImpl implements UserService{
         }
         if(request.getName() != null){
             if (!request.getName().equals(user.getName())) {
-                if (!userRepo.findByName(request.getName()).isEmpty()) {
+                if (userRepo.findByName(request.getName()).isPresent()) {
                     throw new DataAlreadyExistException("User with name '" + request.getName() + "' already exists.");
                 }
             }

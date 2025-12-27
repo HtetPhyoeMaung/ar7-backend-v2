@@ -32,13 +32,14 @@ public class ApplicationConfig {
     @Bean
     public UserDetailsService userDetailsService(){
         return username -> {
-            Optional<User> userByAr7Id = repository.findByAr7Id(username);
-            if (userByAr7Id.isPresent()) {
-                return userByAr7Id.get();
+            System.out.println("username was "+ username);
+            User userByAr7Id = repository.findByAr7Id(username).orElse(null);
+            if (userByAr7Id != null) {
+                return userByAr7Id;
             }
-            Optional<User> userByName = repository.findByName(username);
-            if (userByName.isPresent()) {
-                return userByName.get();
+            User userByName = repository.findByName(username).orElse(null);
+            if (userByName != null) {
+                return userByName;
             }
             throw new UsernameNotFoundException("User not Found");
         };

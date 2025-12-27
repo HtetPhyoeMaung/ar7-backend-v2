@@ -13,9 +13,6 @@ import com.security.spring.thirdpartygames.gameprovider.entity.GameSoftGameProvi
 import com.security.spring.thirdpartygames.gameprovider.repository.GameProviderRepo;
 import com.security.spring.thirdpartygames.lunchGame.dto.LunchGameRequest;
 import com.security.spring.thirdpartygames.lunchGame.dto.LunchGameResponse;
-import com.security.spring.thirdpartygames.transaction.entity.MemberSign;
-import com.security.spring.thirdpartygames.transaction.repsitory.MemberSignRepo;
-import com.security.spring.thirdpartygames.transaction.service.MemberSignService;
 import com.security.spring.user.entity.User;
 import com.security.spring.user.repository.UserRepository;
 import com.security.spring.utils.ConstantInformationForGameSoft;
@@ -32,52 +29,31 @@ import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
-public class LunchGameServiceImpl implements LunchGameService{
-
+public class LunchGameServiceImpl implements LunchGameService {
 
     private final UserRepository userRepository;
-
-    private final MemberSignRepo memberSignRepo;
-
     private final RestTemplate restTemplate;
-
     private final GameTypeRepo gameTypeRepo;
-
     private final GameProviderRepo gameProviderRepo;
-
-    private final MemberSignService memberSignService;
-    
     private final GameBankSettingRepo gameBankSettingRepo;
+    private final ConstantInformationForGameSoft constantDataObj;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
-    ConstantInformationForGameSoft constantDataObj = ConstantInformationForGameSoft.builder().build();
-    private String operatorCode = constantDataObj.getOperatorCode();
-    private String memberName;
-    private String displayName;
-    private String password;
-    private String  languageCode = String.valueOf(constantDataObj.getLanguageCode());
-
-
-    private String apiUrl = constantDataObj.getApiUrl();
-    private String thirdPartyRoute = apiUrl+"/api/operators/launch-game";
-    private String gameBankRoute;
-    private String sign;
-    private String requestTime;
-    private String methodName = "launchgame";
-    private String secretKey = constantDataObj.getSecretKey();
-
     @Override
     @Transactional
-    public LunchGameResponse lunchGameService(LunchGameRequest data,String ar7Id){
+    public LunchGameResponse lunchGameService(LunchGameRequest data, String ar7Id) {
 
         User userObj = userRepository.findByAr7Id(ar7Id).orElseThrow(() -> new RuntimeException("No User Found"));
-        memberName = userObj.getAr7Id();
-        displayName = userObj.getName();
-        password = userObj.getPassword();
+        String memberName = userObj.getAr7Id();
+        String displayName = userObj.getName();
+        String password = userObj.getPassword();
 
-        requestTime = LocalDateTime.now().format(formatter);
-        sign = SignUtil.createSignatureForRequest(operatorCode, Long.parseLong(requestTime),methodName,secretKey);
+        String requestTime = LocalDateTime.now().format(formatter);
+        String operatorCode = constantDataObj.getOperatorCode();
+        String secretKey = constantDataObj.getSecretKey();
+        String methodName = "launchgame";
+        String sign = SignUtil.createSignatureForRequest(operatorCode, Long.parseLong(requestTime), methodName, secretKey);
 
         GameType gameType = gameTypeRepo.findByCode(data.getGameType())
                 .orElseThrow(() -> new DataNotFoundException("No Game Type Found"));
@@ -87,7 +63,7 @@ public class LunchGameServiceImpl implements LunchGameService{
 
         System.out.println("Lunch Game" + data.toString());
 
-//        Create Request Object
+        // Create Request Object
         LunchGameRequest requestObj = LunchGameRequest
                 .builder()
                 .operatorCode(operatorCode)
@@ -96,7 +72,7 @@ public class LunchGameServiceImpl implements LunchGameService{
                 .password(password)
                 .productID(data.getProductID())
                 .gameType(data.getGameType())
-                .languageCode(languageCode)
+                .languageCode(String.valueOf(constantDataObj.getLanguageCode()))
                 .operatorLobbyURL("https://ar7.org/home")
                 .gameID(data.getGameID())
                 .platform(data.getPlatform())
@@ -106,33 +82,34 @@ public class LunchGameServiceImpl implements LunchGameService{
                 .requestTime(requestTime)
                 .build();
 
-//      Header
+        // Header
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-//      Create Request Entity
-        HttpEntity<LunchGameRequest> requestEntity = new HttpEntity<>(requestObj,headers);
+        // Create Request Entity
+        HttpEntity<LunchGameRequest> requestEntity = new HttpEntity<>(requestObj, headers);
 
         System.out.println("Lunch Game Request " + requestObj);
         ResponseEntity<LunchGameResponse> response;
-        if (data.getProductID()==2026){
+        if (data.getProductID() == 2026) {
             GameBankSetting gameBankSetting = gameBankSettingRepo.findAll().stream()
-                    .filter(setting -> setting.getId()==1).findFirst()
-                    .orElseThrow(()-> new DataNotFoundException("Default Game Bank Setting Not Found!"));
-            gameBankRoute = gameBankSetting.getCallBackUrl() + "/api/buffalo/v1/system/access";
-            LaunchGameBankDto launchGameBankDto = LaunchGameBankDto.of(gameBankSetting.getAgentId(), gameBankSetting.getAgentCode(),data.getGameID(), memberName,displayName,userObj.getUserUnits().getMainUnit());
-            HttpEntity<LaunchGameBankDto> gameBankRequestBody = new HttpEntity<>(launchGameBankDto,headers);
+                    .filter(setting -> setting.getId() == 1).findFirst()
+                    .orElseThrow(() -> new DataNotFoundException("Default Game Bank Setting Not Found!"));
+            String gameBankRoute = gameBankSetting.getCallBackUrl() + "/api/buffalo/v1/system/access";
+            LaunchGameBankDto launchGameBankDto = LaunchGameBankDto.of(gameBankSetting.getAgentId(), gameBankSetting.getAgentCode(), data.getGameID(), memberName, displayName, userObj.getUserUnits().getMainUnit());
+            HttpEntity<LaunchGameBankDto> gameBankRequestBody = new HttpEntity<>(launchGameBankDto, headers);
             ResponseEntity<GameBankResponse> gameBankResponse = restTemplate.exchange(gameBankRoute, HttpMethod.POST, gameBankRequestBody,
                     new ParameterizedTypeReference<GameBankResponse>() {
                     });
             assert gameBankResponse.getBody() != null;
             response = LunchGameResponse.fromGameBank(gameBankResponse.getBody());
         } else {
-//        Send Request With Post
-             response = restTemplate.exchange(thirdPartyRoute, HttpMethod.POST, requestEntity,
+            // Send Request With Post
+            String apiUrl = constantDataObj.getApiUrl();
+            String thirdPartyRoute = apiUrl + "/api/operators/launch-game";
+            response = restTemplate.exchange(thirdPartyRoute, HttpMethod.POST, requestEntity,
                     new ParameterizedTypeReference<LunchGameResponse>() {
                     });
-
         }
         try {
             System.out.println(new ObjectMapper().writeValueAsString(response.getBody()));
@@ -140,16 +117,5 @@ public class LunchGameServiceImpl implements LunchGameService{
             throw new RuntimeException(e);
         }
         return response.getBody();
-    }
-
-    private MemberSign createOrUpdateSign(String sign, String memberName) {
-        var result =memberSignService.findByMemberName(memberName);
-        if (result.isEmpty()){
-            MemberSign createSign = MemberSign.builder().sign(sign).memberName(memberName).build();
-            return memberSignRepo.save(createSign);
-        }
-        var resultGet = result.get();
-        resultGet.setSign(sign);
-        return memberSignRepo.save(resultGet);
     }
 }

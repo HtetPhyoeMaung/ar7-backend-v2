@@ -31,29 +31,26 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProviderListServiceImpl implements ProviderListService {
     private final RestTemplate restTemplate;
-
     private final GameTypeRepo gameTypeRepo;
-
     private final GameProviderRepo gameProviderRepo;
+    private final ConstantInformationForGameSoft constantDataObj;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-
-    private final List blackListGameTypeCodes = List.of("14", "18", "19", "Q", "JACKPOT" , "BONUS");
-    ConstantInformationForGameSoft constantDataObj = ConstantInformationForGameSoft.builder().build();
-
-    private final String operatorCode = constantDataObj.getOperatorCode();
-    private final String secretKey = constantDataObj.getSecretKey();
-    private final String apiUrl = constantDataObj.getApiUrl();
-    private final String thirdPartyRoute = apiUrl + "/api/operators/available-products";
+    private final List<String> blackListGameTypeCodes = List.of("14", "18", "19", "Q", "JACKPOT", "BONUS");
 
     @Override
     @Transactional
     public ResponseEntity<ProviderResponse> getProviderListByGameType(String gameType) {
-        if (gameType!=null) {
+        if (gameType != null) {
             gameTypeRepo.findByCode(gameType).orElseThrow(() -> new DataNotFoundException("Game type not found: " + gameType));
         }
         String methodName = "productlist";
         String requestTime = LocalDateTime.now().format(formatter);
+        String operatorCode = constantDataObj.getOperatorCode();
+        String secretKey = constantDataObj.getSecretKey();
+        String apiUrl = constantDataObj.getApiUrl();
+        String thirdPartyRoute = apiUrl + "/api/operators/available-products";
+
         String sign = SignUtil.createSignatureForRequest(operatorCode, Long.parseLong(requestTime), methodName, secretKey);
         URI uri = UriComponentsBuilder.fromHttpUrl(thirdPartyRoute)
                 .queryParam("operator_code", operatorCode)
@@ -62,31 +59,32 @@ public class ProviderListServiceImpl implements ProviderListService {
                 .build()
                 .toUri();
 
-        log.info("Request URI: {}" , uri);
+        log.info("Request URI: {}", uri);
         ResponseEntity<List<ProviderDataFeign>> response;
         try {
-             response = restTemplate.exchange(uri, HttpMethod.GET,
-                     null,
-                     new ParameterizedTypeReference<List<ProviderDataFeign>>() {});
+            response = restTemplate.exchange(uri, HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<List<ProviderDataFeign>>() {
+                    });
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body(ProviderResponse.builder()
-                            .code(500)
-                            .message(e.getMessage())
+                    .code(500)
+                    .message(e.getMessage())
                     .build());
         }
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             List<ProviderDataFeign> providerListFeignResponse = response.getBody();
             List<ProviderResponse.ProviderData> providerList;
-             if (gameType==null){
-                 providerList = providerListFeignResponse.stream().map(ProviderResponse.ProviderData::of).toList();
-             }else {
-                 // Filter providers by game type
-                 providerList = providerListFeignResponse.stream()
-                         .filter(provider -> provider.getGameType().equalsIgnoreCase(gameType))
-                         .map(ProviderResponse.ProviderData::of)
-                         .toList();
-             }
+            if (gameType == null) {
+                providerList = providerListFeignResponse.stream().map(ProviderResponse.ProviderData::of).toList();
+            } else {
+                // Filter providers by game type
+                providerList = providerListFeignResponse.stream()
+                        .filter(provider -> provider.getGameType().equalsIgnoreCase(gameType))
+                        .map(ProviderResponse.ProviderData::of)
+                        .toList();
+            }
 
             return ResponseEntity.ok(ProviderResponse.builder()
                     .code(200)

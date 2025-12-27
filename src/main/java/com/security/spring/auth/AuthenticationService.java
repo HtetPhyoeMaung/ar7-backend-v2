@@ -213,8 +213,10 @@ public class AuthenticationService {
             throw new InvalidException("ar7Id and password is not valid.");
         }
 
-        User user = repository.findByAr7Id(request.getAr7Id())
-                .orElseThrow(() -> new DataNotFoundException("user can't found."));
+        User user = repository.findByAr7Id(request.getAr7Id()).orElse(null);
+        if(user == null){
+            user = repository.findByName(request.getAr7Id()).orElseThrow(() -> new DataNotFoundException("user can't found."));
+        }
 
         user.setLoginTime(LocalDateTime.now());
 

@@ -411,6 +411,10 @@ public class UserServiceImpl implements UserService{
     @Override
     public UserResponse editProfile(String ar7Id, ProfileEditRequest request) {
         User user = findByAr7Id(ar7Id);
+        if (userRepo.findByName(request.getName()).isPresent()) {
+            throw new DataAlreadyExistException("User with name '" + request.getName() + "' already exists.");
+        }
+
         user = edit(request, user);
         UserResponseObj userResponseObj = UserResponseObj
                 .builder()

@@ -6,6 +6,8 @@ import com.security.spring.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -40,6 +42,27 @@ public interface GameSoftTransactionRepo extends JpaRepository<GameSoftTransacti
 
     Page<GameSoftTransaction> findByCreatedOnBetweenAndGameSoftTransitionUser_Ar7IdAndGameType_IdAndStatus(LocalDateTime localDateTime, LocalDateTime localDateTime1, String ar7Id, int gameTypeId, String  wagerStatus, Pageable pageable);
 
-
+    @Query("""
+            select new com.security.spring.report.dto.UserReportObj(
+                t.gameSoftTransitionUser.ar7Id,
+                coalesce(t.gameType.id, 1),
+                coalesce(t.gameType.description, 'စလော့'),
+                count(t),
+                sum(t.betAmount),
+                sum(t.amount)
+            )
+            from GameSoftTransaction t
+            where (:user is null or t.gameSoftTransitionUser = :user)
+              and (:status is null or t.status = :status)
+              and (:start is null or t.createdOn >= :start)
+              and (:end is null or t.createdOn <= :end)
+            group by t.gameSoftTransitionUser.ar7Id, t.gameType.id, t.gameType.description
+            """)
+    List<com.security.spring.report.dto.UserReportObj> aggregateUserReport(
+            @Param("user") User user,
+            @Param("status") String status,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
 }
 

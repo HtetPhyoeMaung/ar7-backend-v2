@@ -17,38 +17,51 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="gamesoft_transaction")
+@Table(
+        name = "gamesoft_transaction",
+        indexes = {
+                @Index(name = "uk_gst_transaction_id", columnList = "transaction_id", unique = true),
+                @Index(name = "uk_gst_spin_id", columnList = "spin_id", unique = true),
+                @Index(name = "idx_gst_created_status", columnList = "created_on,status"),
+                @Index(name = "idx_gst_user_created", columnList = "user_id,created_on"),
+                @Index(name = "idx_gst_user_game_status_created", columnList = "user_id,game_type_id,status,created_on")
+        }
+)
 public class GameSoftTransaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     @JsonIgnore
     @ToString.Exclude
     private User gameSoftTransitionUser;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="wagerId")
     @JsonIgnore
     @ToString.Exclude
     private GameSoftWager gameSoftWager;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="game_provider_id")
     @JsonIgnore
     @ToString.Exclude
     private GameSoftGameProvider productID;
 
     private Currency currency;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="game_type_id")
     @JsonIgnore
     @ToString.Exclude
     private GameType gameType;
+
+    @Column(name = "transaction_id", nullable = false)
     private String transactionId;
+
+    @Column(name = "spin_id")
     private String spinId;
     private boolean isCommissionCalculate;
     private String action;
@@ -57,6 +70,7 @@ public class GameSoftTransaction {
     private String channelCode;
     private String roundId;
     private String wagerCode;
+    @Column(name = "wager_status")
     private String wagerStatus;
     private double commisionAmount;
     private double beforeBalance;
@@ -67,10 +81,12 @@ public class GameSoftTransaction {
     private String payload;
     private Long settleAt;
     private String gameCode;
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private String  status;
     @DateTimeFormat(pattern = "yyyy-MM-dd-HH-mm-ss")
+    @Column(name = "created_on")
     private LocalDateTime createdOn;
     @DateTimeFormat(pattern = "yyyy-MM-dd-HH-mm-ss")
+    @Column(name = "modified_on")
     private LocalDateTime modifiedOn;
 }

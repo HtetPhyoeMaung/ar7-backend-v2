@@ -1,9 +1,6 @@
 package com.security.spring.commission.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +13,15 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(
+        name = "commission_confirm",
+        indexes = {
+                @Index(name = "idx_commission_confirm_date", columnList = "confirm_date"),
+                @Index(name = "idx_commission_agent_date", columnList = "agent_ar7_id,confirm_date"),
+                @Index(name = "idx_commission_master_date", columnList = "master_ar7_id,confirm_date"),
+                @Index(name = "idx_commission_semaster_date", columnList = "se_master_a7_id,confirm_date")
+        }
+)
 public class CommissionConfirm {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

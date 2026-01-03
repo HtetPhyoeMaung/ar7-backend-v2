@@ -3,6 +3,7 @@ package com.security.spring.gamebank.controller;
 import com.security.spring.gamebank.dto.GameBankBalanceResponse;
 import com.security.spring.gamebank.dto.GameBankResultResponse;
 import com.security.spring.gamebank.param.GameBankBalanceRequest;
+import com.security.spring.gamebank.param.GameBankBuyScatterRequest;
 import com.security.spring.gamebank.param.GameBankResultRequest;
 import com.security.spring.gamebank.service.IGameBankService;
 import jakarta.validation.Valid;
@@ -33,6 +34,14 @@ public class CallBackController {
             ){
         log.info("Result Call Back Request : {}", gameBankResultRequest);
         return gameBankService.setResult(gameBankResultRequest);
+    }
+
+    @PostMapping("/buy-scatter")
+    public ResponseEntity<GameBankResultResponse> buyScatter(
+            @RequestBody @Valid GameBankBuyScatterRequest gameBankBuyScatterRequest
+    ){
+        log.info("Buy Scatter Call Back Request : {}", gameBankBuyScatterRequest);
+        return gameBankService.buyScatter(gameBankBuyScatterRequest);
     }
 
 }

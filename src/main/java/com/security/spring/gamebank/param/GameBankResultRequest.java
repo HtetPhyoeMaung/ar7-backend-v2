@@ -16,8 +16,6 @@ public class GameBankResultRequest {
     private String spinId;
     @NotBlank(message = "game_type must not be null or blank!")
     private String gameType;
-    @NotBlank(message = "game_code must not be null or blank!")
-    private String gameCode;
     @NotBlank(message = "game_name must not be null or blank!")
     private String gameName;
     @PositiveOrZero(message = "bet_amount must be zero or a positive number!")

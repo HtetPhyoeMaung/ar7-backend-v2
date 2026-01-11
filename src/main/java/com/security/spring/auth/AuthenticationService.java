@@ -114,7 +114,7 @@ public class AuthenticationService {
                             .orElseThrow(()-> new DataNotFoundException("Promo Code မှားယွင်းနေပါသည်!"));
                     promoCode = registerRequest.getPromoCode();
                 }else {
-                    promoCode = "dev";
+                    promoCode = "009";
                 }
 
                 user = User.builder()
@@ -155,7 +155,7 @@ public class AuthenticationService {
                     user.setPromoCode(userPromoCode);
                 } else {
                     // Set default promo code 'dev' when user doesn't input promoCode
-                    user.setPromoCode("dev");
+                    user.setPromoCode("009");
                 }
                 password = registerRequest.getPassword();
                 user = userRepository.save(user);

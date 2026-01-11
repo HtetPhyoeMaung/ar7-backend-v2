@@ -84,15 +84,38 @@ public class AuthenticationService {
                     .secretCode(secretCode)
                     .build();
             if (downLineAr7Id.startsWith("AFG")){
-                user.setCode(AR7IdGenerate.generateKey(6));
+                String promoCode = registerRequest.getPromoCode();
+                if (promoCode == null || promoCode.trim().isEmpty()) {
+                    throw new FieldRequireException("Promo code is required for AFFILIATEAGENT.");
+                }
+                // Validate promo code is exactly 3 characters
+                if (promoCode.length() != 3) {
+                    throw new InvalidException("Promo code must be exactly 3 characters.");
+                }
+                // Check if promo code already exists
+                if (userRepository.existsByCode(promoCode)) {
+                    throw new DataAlreadyExistException("Promo code already exists.");
+                }
+                user.setCode(promoCode);
             }
 
             user = userRepository.save(user);
 
         }else {
             parentAr7Id = "AG0000009";
+            String promoCode;
+
             String ar7Id = generateAr7Prefix(Role.USER) + AR7IdGenerate.generateDigit();
-            if(registerRequest == null){
+            if(registerRequest!=null && registerRequest.getPassword()==null &&
+                    registerRequest.getSecretCode()==null){
+
+                if (registerRequest.getPromoCode() != null && !registerRequest.getPromoCode().trim().isEmpty()) {
+                    userRepository.findByPromoCode(registerRequest.getPromoCode())
+                            .orElseThrow(()-> new DataNotFoundException("Promo Code မှားယွင်းနေပါသည်!"));
+                    promoCode = registerRequest.getPromoCode();
+                }else {
+                    promoCode = "dev";
+                }
 
                 user = User.builder()
                         .userId(0)
@@ -104,6 +127,7 @@ public class AuthenticationService {
                         .parentUserId(parentAr7Id)
                         .userUnits(unit)
                         .secretCode(secretCode)
+                        .promoCode(promoCode)
                         .build();
                 user = userRepository.save(user);
             }else{
@@ -124,10 +148,14 @@ public class AuthenticationService {
                         .secretCode(registerRequest.getSecretCode())
                         .build();
 
-                if (registerRequest.getPromoCode()!=null){
-                    userRepository.findByPromoCode(registerRequest.getPromoCode())
+                String userPromoCode = registerRequest.getPromoCode();
+                if (userPromoCode != null && !userPromoCode.trim().isEmpty()) {
+                    userRepository.findByPromoCode(userPromoCode)
                             .orElseThrow(()-> new DataNotFoundException("Promo Code မှားယွင်းနေပါသည်!"));
-                    user.setPromoCode(registerRequest.getPromoCode());
+                    user.setPromoCode(userPromoCode);
+                } else {
+                    // Set default promo code 'dev' when user doesn't input promoCode
+                    user.setPromoCode("dev");
                 }
                 password = registerRequest.getPassword();
                 user = userRepository.save(user);
@@ -160,7 +188,8 @@ public class AuthenticationService {
                 .role(user.getRole())
                 .secretCode(user.getSecretCode())
                 .ar7Id(user.getAr7Id())
-                .promoCode(user.getCode())
+                .code(user.getCode())
+                .promoCode(user.getPromoCode())
                 .status(true)
                 .build();
     }
@@ -202,6 +231,16 @@ public class AuthenticationService {
             throw new FieldRequireException("Field were require to login");
         }
 
+        // Debug logging
+        User debugUser = repository.findByAr7Id(request.getAr7Id()).orElse(null);
+        if (debugUser != null) {
+            log.debug("DEBUG: User found - ar7Id: {}, stored password hash: {}", request.getAr7Id(), debugUser.getPassword());
+            boolean passwordMatches = passwordEncoder.matches(request.getPassword(), debugUser.getPassword());
+            log.debug("DEBUG: Password matches: {}", passwordMatches);
+        } else {
+            log.debug("DEBUG: User not found with ar7Id: {}", request.getAr7Id());
+        }
+
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -210,6 +249,7 @@ public class AuthenticationService {
                     )
             );
         } catch (RuntimeException e) {
+            log.error("DEBUG: Authentication failed for ar7Id: {}, error: {}", request.getAr7Id(), e.getMessage(), e);
             throw new InvalidException("ar7Id and password is not valid.");
         }
 

@@ -26,11 +26,18 @@ public class CommissionConfirm {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(name = "agent_ar7_id")
     private String agentAr7Id;
+    @Column(name = "agent_win_lose_amount")
     private double agentWinLoseAmount;
+    @Column(name = "master_ar7_id")
     private String masterAr7Id;
+    @Column(name = "master_win_lose_amount")
     private double masterWinLoseAmount;
+    @Column(name = "se_master_a7_id")
     private String seMasterA7Id;
+    @Column(name = "se_master_win_lose_amount")
     private double seMasterWinLoseAmount;
+    @Column(name = "confirm_date")
     private LocalDateTime confirmDate;
 }

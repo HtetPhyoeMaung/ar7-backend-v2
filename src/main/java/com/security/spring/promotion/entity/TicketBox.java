@@ -10,7 +10,9 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @Data
-@Table(name = "ticketBoxes")
+@Table(name = "ticketBoxes", indexes = {
+        @Index(name = "idx_ticket_box_user", columnList = "user_id")
+})
 public class TicketBox {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

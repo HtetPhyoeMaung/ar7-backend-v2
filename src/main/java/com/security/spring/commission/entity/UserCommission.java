@@ -12,7 +12,12 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="user_commission")
+@Table(name="user_commission", indexes = {
+        @Index(name = "idx_user_commission_user", columnList = "commission_user_id"),
+        @Index(name = "idx_user_commission_game_type", columnList = "gameType_id"),
+        @Index(name = "idx_user_commission_upline", columnList = "upLineAr7Id"),
+        @Index(name = "idx_user_commission_user_game", columnList = "commission_user_id,gameType_id")
+})
 public class UserCommission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

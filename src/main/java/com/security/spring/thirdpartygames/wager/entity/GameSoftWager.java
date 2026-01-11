@@ -18,7 +18,15 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="wager")
+@Table(name="wager", indexes = {
+        @Index(name = "idx_wager_wager_id", columnList = "wagerID"),
+        @Index(name = "idx_wager_member_id", columnList = "member_id"),
+        @Index(name = "idx_wager_product_id", columnList = "product_id"),
+        @Index(name = "idx_wager_game_type_id", columnList = "game_type_id"),
+        @Index(name = "idx_wager_status", columnList = "status"),
+        @Index(name = "idx_wager_created_on", columnList = "createdOn"),
+        @Index(name = "idx_wager_member_status", columnList = "member_id,status")
+})
 public class GameSoftWager {
 
     @Id

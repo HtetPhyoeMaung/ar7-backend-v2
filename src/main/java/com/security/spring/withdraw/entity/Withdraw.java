@@ -13,7 +13,16 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 @Builder
-@Table(name="withdraw")
+@Table(name="withdraw", indexes = {
+        @Index(name = "idx_withdraw_user", columnList = "withdraw_user_id"),
+        @Index(name = "idx_withdraw_parent_user", columnList = "withdraw_parent_user_id"),
+        @Index(name = "idx_withdraw_status", columnList = "withdrawStatus"),
+        @Index(name = "idx_withdraw_action_time", columnList = "actionTime"),
+        @Index(name = "idx_withdraw_parent_status", columnList = "withdraw_parent_user_id,withdrawStatus"),
+        @Index(name = "idx_withdraw_user_status", columnList = "withdraw_user_id,withdrawStatus"),
+        @Index(name = "idx_withdraw_action_time_parent", columnList = "actionTime,withdraw_parent_user_id"),
+        @Index(name = "idx_withdraw_action_time_user", columnList = "actionTime,withdraw_user_id")
+})
 public class Withdraw {
 
     @Id

@@ -13,7 +13,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "game_table")
+@Table(name = "game_table", indexes = {
+        @Index(name = "idx_game_table_space_tech_game", columnList = "space_tech_game_id"),
+        @Index(name = "idx_game_table_level", columnList = "level"),
+        @Index(name = "idx_game_table_level_space_tech_game", columnList = "level,space_tech_game_id")
+})
 public class GameTable {
 
     @Id

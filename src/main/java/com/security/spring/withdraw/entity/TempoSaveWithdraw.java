@@ -11,7 +11,11 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "tempo_save_withdraw")
+@Table(name = "tempo_save_withdraw", indexes = {
+        @Index(name = "idx_tempo_save_withdraw_user", columnList = "tempo_withdraw_user_id"),
+        @Index(name = "idx_tempo_save_withdraw_save_date", columnList = "saveDate"),
+        @Index(name = "idx_tempo_save_withdraw_user_amount_date", columnList = "tempo_withdraw_user_id,amount,saveDate")
+})
 public class TempoSaveWithdraw {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

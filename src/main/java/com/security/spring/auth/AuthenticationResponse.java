@@ -23,6 +23,7 @@ public class AuthenticationResponse {
     private String password;
     private String message;
     private Boolean status;
+    private String code;
     private String promoCode;
     private Map<String, String> component;
 }

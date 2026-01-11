@@ -11,7 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Data
-@Table(name = "jwt_blacklists")
+@Table(name = "jwt_blacklists", indexes = {
+        @Index(name = "idx_jwt_blacklist_token", columnList = "token")
+})
 public class JWTBlackList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

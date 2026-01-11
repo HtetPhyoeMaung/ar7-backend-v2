@@ -14,7 +14,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "space_tech_game")
+@Table(name = "space_tech_game", indexes = {
+        @Index(name = "idx_space_tech_game_game_type", columnList = "game_type_id"),
+        @Index(name = "idx_space_tech_game_game_name", columnList = "gameName")
+})
 public class SpaceTechGame {
 
     @Id

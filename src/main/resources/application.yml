@@ -2,7 +2,7 @@ spring:
   sql:
     init:
       mode: always
-      schema-locations: classpath:initial.sql
+      continue-on-error: true
   server:
     port: 8080
     address: 0.0.0.0
@@ -20,6 +20,7 @@ spring:
     testWhileIdle: true
     validationQuery: SELECT 1
   jpa:
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: update
     show-sql: true
@@ -43,6 +44,7 @@ logging:
   level:
     org:
       springframework.jdbc.core: TRACE
+      springframework.jdbc.datasource.init: DEBUG
       com.zaxxer.hikari: DEBUG
       hibernate:
         SQL: DEBUG
@@ -50,6 +52,7 @@ logging:
           descriptor:
             sql:
               BasicBinder: TRACE
+    com.security.spring.auth.AuthenticationService: DEBUG
 
 digitalocean:
   spaces:

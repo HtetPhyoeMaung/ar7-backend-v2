@@ -22,4 +22,16 @@ public class AR7IdGenerate {
 
         return prefix + randomPart.toString();
     }
+
+    public static String generatePromoCode(int length) {
+        String characters = "abcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        StringBuilder code = new StringBuilder();
+
+        for (int i = 0; i < length; i++) {
+            code.append(characters.charAt(random.nextInt(characters.length())));
+        }
+
+        return code.toString();
+    }
 }

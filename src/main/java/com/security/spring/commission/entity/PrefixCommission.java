@@ -1,9 +1,6 @@
 package com.security.spring.commission.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +13,12 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(indexes = {
+        @Index(name = "idx_prefix_commission_agent_ar7_id", columnList = "agentAr7Id"),
+        @Index(name = "idx_prefix_commission_master_ar7_id", columnList = "masterAr7Id"),
+        @Index(name = "idx_prefix_commission_se_master_ar7_id", columnList = "seMasterAr7Id"),
+        @Index(name = "idx_prefix_commission_agent_master_se", columnList = "agentAr7Id,masterAr7Id,seMasterAr7Id")
+})
 public class PrefixCommission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

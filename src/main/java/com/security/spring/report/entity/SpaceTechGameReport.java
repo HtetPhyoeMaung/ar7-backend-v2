@@ -12,6 +12,12 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Builder
 @Data
+@Table(indexes = {
+        @Index(name = "idx_stgr_calculate_status", columnList = "calculateStatus"),
+        @Index(name = "idx_stgr_game_type", columnList = "game_type_id"),
+        @Index(name = "idx_stgr_user_id", columnList = "userId"),
+        @Index(name = "idx_stgr_status", columnList = "status")
+})
 public class SpaceTechGameReport implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;

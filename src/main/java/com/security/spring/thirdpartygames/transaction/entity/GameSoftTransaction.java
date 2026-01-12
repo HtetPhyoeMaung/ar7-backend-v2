@@ -58,7 +58,7 @@ public class GameSoftTransaction {
     @ToString.Exclude
     private GameType gameType;
 
-    @Column(name = "transaction_id", nullable = false)
+    @Column(name = "transaction_id", nullable = true)
     private String transactionId;
 
     @Column(name = "spin_id")

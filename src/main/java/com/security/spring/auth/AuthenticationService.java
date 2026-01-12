@@ -110,7 +110,7 @@ public class AuthenticationService {
                     registerRequest.getSecretCode()==null){
 
                 if (registerRequest.getPromoCode() != null && !registerRequest.getPromoCode().trim().isEmpty()) {
-                    userRepository.findByPromoCode(registerRequest.getPromoCode())
+                    userRepository.findByCode(registerRequest.getPromoCode())
                             .orElseThrow(()-> new DataNotFoundException("Promo Code မှားယွင်းနေပါသည်!"));
                     promoCode = registerRequest.getPromoCode();
                 }else {
@@ -150,7 +150,7 @@ public class AuthenticationService {
 
                 String userPromoCode = registerRequest.getPromoCode();
                 if (userPromoCode != null && !userPromoCode.trim().isEmpty()) {
-                    userRepository.findByPromoCode(userPromoCode)
+                    userRepository.findByCode(userPromoCode)
                             .orElseThrow(()-> new DataNotFoundException("Promo Code မှားယွင်းနေပါသည်!"));
                     user.setPromoCode(userPromoCode);
                 } else {
@@ -260,19 +260,23 @@ public class AuthenticationService {
 
         user.setLoginTime(LocalDateTime.now());
 
+        // Blacklist old tokens before generating new ones
         if(user.getRefreshToken() != null){
+            log.debug("Blacklisting old refreshToken for user: {}", request.getAr7Id());
             jwtBlackListService.addToBlackListToken(user.getRefreshToken());
         }
 
         if(user.getAccessToken() != null){
+            log.debug("Blacklisting old accessToken for user: {}", request.getAr7Id());
             jwtBlackListService.addToBlackListToken(user.getAccessToken());
         }
 
-        // Generate tokens using updated JWTService methods
+        // Generate new tokens using updated JWTService methods
         var accessToken = jwtService.generateAccessToken(user); // 15-minute access token
         var refreshToken = jwtService.generateRefreshToken(user);// 7-day refresh token stored in Redis
         user.setAccessToken(accessToken);
         user.setRefreshToken(refreshToken);
+        log.debug("Generated new tokens for user: {}", request.getAr7Id());
 
         user = repository.save(user);// Still save for loginTime update
         Component component = componentRepository.findByRole(user.getRole());

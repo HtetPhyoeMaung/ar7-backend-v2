@@ -11,7 +11,10 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "register_status")
+@Table(name = "register_status", indexes = {
+        @Index(name = "idx_register_status_user", columnList = "user_id"),
+        @Index(name = "idx_register_status_status", columnList = "registerStatus")
+})
 public class RegisterStatus implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;

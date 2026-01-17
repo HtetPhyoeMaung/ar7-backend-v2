@@ -1,9 +1,6 @@
 package com.security.spring.commission.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +13,12 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(indexes = {
+        @Index(name = "idx_user_win_lose_parent_agent", columnList = "parentAgentId"),
+        @Index(name = "idx_user_win_lose_agent_commission_status", columnList = "agentCommissionStatus"),
+        @Index(name = "idx_user_win_lose_confirm", columnList = "confirm"),
+        @Index(name = "idx_user_win_lose_status_confirm", columnList = "agentCommissionStatus,confirm")
+})
 public class UserWinLoseDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

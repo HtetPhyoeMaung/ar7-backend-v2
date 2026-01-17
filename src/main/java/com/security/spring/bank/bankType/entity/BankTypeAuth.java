@@ -9,7 +9,15 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "banktype_auth")
+@Table(name = "banktype_auth", indexes = {
+        @Index(name = "idx_bank_type_auth_user", columnList = "user_id"),
+        @Index(name = "idx_bank_type_auth_bank_type", columnList = "bank_type_id"),
+        @Index(name = "idx_bank_type_auth_status", columnList = "bankTypeStatus"),
+        @Index(name = "idx_bank_type_auth_init_status", columnList = "initStatus"),
+        @Index(name = "idx_bank_type_auth_user_bank_type", columnList = "user_id,bank_type_id"),
+        @Index(name = "idx_bank_type_auth_user_status", columnList = "user_id,bankTypeStatus"),
+        @Index(name = "idx_bank_type_auth_user_status_init", columnList = "user_id,bankTypeStatus,initStatus")
+})
 public class BankTypeAuth {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

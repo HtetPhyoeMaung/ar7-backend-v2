@@ -14,7 +14,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 @Builder
-@Table(name = "notifications")
+@Table(name = "notifications", indexes = {
+        @Index(name = "idx_notification_receiver", columnList = "receiverId"),
+        @Index(name = "idx_notification_sender", columnList = "senderId"),
+        @Index(name = "idx_notification_type", columnList = "type"),
+        @Index(name = "idx_notification_created_time", columnList = "createdTime"),
+        @Index(name = "idx_notification_receiver_type", columnList = "receiverId,type")
+})
 public class Notification {
 
     @Id
@@ -27,6 +33,7 @@ public class Notification {
     private LocalDateTime updatedTime;
     private String senderId;
     private String receiverId;
+    @Enumerated(EnumType.STRING)
     private Type type;
 
     public enum Type{

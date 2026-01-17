@@ -14,7 +14,15 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Data
-@Table(name="bank_acc")
+@Table(name="bank_acc", indexes = {
+        @Index(name = "idx_bank_acc_user", columnList = "user_id"),
+        @Index(name = "idx_bank_acc_bank_name", columnList = "bankNameId"),
+        @Index(name = "idx_bank_acc_account_status", columnList = "account_status"),
+        @Index(name = "idx_bank_acc_account_number", columnList = "account_number"),
+        @Index(name = "idx_bank_acc_user_bank", columnList = "user_id,bankNameId"),
+        @Index(name = "idx_bank_acc_user_status", columnList = "user_id,account_status"),
+        @Index(name = "idx_bank_acc_bank_name_status", columnList = "bankNameId,account_status")
+})
 public class BankAcc {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

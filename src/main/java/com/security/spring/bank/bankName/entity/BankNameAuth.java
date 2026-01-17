@@ -16,7 +16,17 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="bank_name_auth")
+@Table(name="bank_name_auth", indexes = {
+        @Index(name = "idx_bank_name_auth_user", columnList = "user_id"),
+        @Index(name = "idx_bank_name_auth_bank_type", columnList = "bank_type_id"),
+        @Index(name = "idx_bank_name_auth_bank_name", columnList = "bank_name_id"),
+        @Index(name = "idx_bank_name_auth_status", columnList = "bankNameStatus"),
+        @Index(name = "idx_bank_name_auth_initial_status", columnList = "initialStatus"),
+        @Index(name = "idx_bank_name_auth_user_bank_name", columnList = "user_id,bank_name_id"),
+        @Index(name = "idx_bank_name_auth_user_status", columnList = "user_id,bankNameStatus"),
+        @Index(name = "idx_bank_name_auth_user_type_name", columnList = "user_id,bank_type_id,bank_name_id"),
+        @Index(name = "idx_bank_name_auth_user_status_initial", columnList = "user_id,bankNameStatus,initialStatus")
+})
 public class BankNameAuth {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

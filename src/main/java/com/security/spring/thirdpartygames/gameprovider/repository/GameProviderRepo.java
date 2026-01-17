@@ -15,5 +15,5 @@ public interface GameProviderRepo extends JpaRepository<GameSoftGameProvider,Int
 
     void deleteAllByProductCodeIn(List<String> rejectProviderList);
 
-    GameSoftGameProvider findByProduct(Long product);
+    Optional<GameSoftGameProvider> findByProduct(Long product);
 }

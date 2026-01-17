@@ -55,13 +55,14 @@ public class LunchGameServiceImpl implements LunchGameService {
         String methodName = "launchgame";
         String sign = SignUtil.createSignatureForRequest(operatorCode, Long.parseLong(requestTime), methodName, secretKey);
 
-        GameType gameType = gameTypeRepo.findByCode(data.getGameType())
-                .orElseThrow(() -> new DataNotFoundException("No Game Type Found"));
+
         GameSoftGameProvider provider;
-        if(data.getProductID() == 2026 && !gameType.getCode().equals("SLOT")){
+        if(data.getProductID() == 2026 && !data.getGameType().equals("SLOT")){
             provider = gameProviderRepo.findByProduct(Long.valueOf(data.getProductID()))
                     .orElseThrow(() -> new DataNotFoundException("No Game Provider Found"));
         }else{
+            GameType gameType = gameTypeRepo.findByCode(data.getGameType())
+                    .orElseThrow(() -> new DataNotFoundException("No Game Type Found"));
             provider = gameProviderRepo.findByProductAndGameType(Long.valueOf(data.getProductID()), gameType)
                     .orElseThrow(() -> new DataNotFoundException("No Game Provider Found"));
         }

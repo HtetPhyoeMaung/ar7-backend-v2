@@ -7,16 +7,19 @@ spring:
     port: 8080
     address: 0.0.0.0
   redis:
-    host: redis-container
-    port: 6379
+    host: ${SPRING_REDIS_HOST:redis-container}
+    port: ${SPRING_REDIS_PORT:6379}
+    timeout: 2000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
   datasource:
-    url: jdbc:mysql://ar7-db-do-user-15535699-0.f.db.ondigitalocean.com:25060/ar7_db?sessionVariables=sql_require_primary_key=0
-    username: doadmin
-    password: AVNS_SaAi_cdXAVYXAK0mJsk
-    #    url: jdbc:mysql://localhost:3306/ar7_database
-    #    username: kyawgyi
-    #    password: admin
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres-container:5432/ar7_db}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
+    driver-class-name: org.postgresql.Driver
     testWhileIdle: true
     validationQuery: SELECT 1
   jpa:
@@ -39,6 +42,8 @@ spring:
 
 file:
   upload-dir: ./upload-dir
+  cdn:
+    domain: https://ar7myanmar.com
 
 logging:
   level:

@@ -1,51 +1,29 @@
 package com.security.spring.storage;
 
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.*;
-
 import com.security.spring.utils.UUIDGenerator;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import com.amazonaws.services.s3.AmazonS3;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URL;
-
-
-
-import org.springframework.web.multipart.MultipartFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import javax.imageio.ImageIO;
 
-
 @Service
 public class StorageService {
-    private final AmazonS3 space;
+    
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
-    private static final String BUCKET_NAME = "ar7imageserversit";
-
-    public StorageService() {
-        // Create the AWS credentials provider
-        AWSCredentialsProvider awsCredentialsProvider = new AWSStaticCredentialsProvider(
-                new BasicAWSCredentials("DO00B3NREZ8TTDVT8Y77", "qnooagiCt6cgttIJVvjt919IJfmY67GIuAA2hsYXvvw")
-        );
-
-        // Initialize the Amazon S3 client
-        space = AmazonS3ClientBuilder
-                .standard()
-                .withCredentials(awsCredentialsProvider)
-                .withEndpointConfiguration(
-                        new AwsClientBuilder.EndpointConfiguration("sgp1.digitaloceanspaces.com", "sgp1")
-                )
-                .build();
-    }
+    @Value("${file.cdn.domain}")
+    private String cdnDomain;
     public BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
         Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
         BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
@@ -54,86 +32,88 @@ public class StorageService {
         g2d.dispose();
         return outputImage;
     }
+    
+    private Path ensureUploadDirectory() throws IOException {
+        Path uploadPath = Paths.get(uploadDir);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+        return uploadPath;
+    }
     public String uploadImage(MultipartFile file) throws IOException {
+        // Ensure upload directory exists
+        Path uploadPath = ensureUploadDirectory();
+        
         // Generate unique file name
         String filename = UUIDGenerator.generateUUID() + file.getOriginalFilename();
+        
         // Convert MultipartFile to BufferedImage
         BufferedImage inputImage = ImageIO.read(file.getInputStream());
+        
         // Resize image (you can specify target width and height here)
         int targetWidth = 500;
         int targetHeight = 300;
         BufferedImage resizedImage = resizeImage(inputImage, targetWidth, targetHeight);
-        // Convert resized BufferedImage back to InputStream
+        
+        // Convert resized BufferedImage to file
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(resizedImage, "jpg", baos);
         byte[] resizedBytes = baos.toByteArray();
-        ByteArrayInputStream resizedInputStream = new ByteArrayInputStream(resizedBytes);
-        // Create object metadata
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentType(file.getContentType());
-        objectMetadata.setContentLength(resizedBytes.length);
-        // Upload to DigitalOcean Spaces
-        space.putObject(new PutObjectRequest(BUCKET_NAME, filename, resizedInputStream, objectMetadata)
-                .withCannedAcl(CannedAccessControlList.PublicRead));
-
+        
+        // Save resized image to local directory
+        Path filePath = uploadPath.resolve(filename);
+        Files.write(filePath, resizedBytes);
+        
         return filename;
     }
 
-    //hello
     public String uploadFile(byte[] fileData, String fileName, String contentType) throws IOException {
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentType(contentType);
-        objectMetadata.setContentLength(fileData.length);
-
-        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(fileData)) {
-            space.putObject(new PutObjectRequest(BUCKET_NAME, fileName, inputStream, objectMetadata)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
-        }
-
-        // Return the URL of the uploaded file
-        return space.getUrl(BUCKET_NAME, fileName).toString();
+        // Ensure upload directory exists
+        Path uploadPath = ensureUploadDirectory();
+        
+        // Save file to local directory
+        Path filePath = uploadPath.resolve(fileName);
+        Files.write(filePath, fileData);
+        
+        // Return CDN URL
+        return cdnDomain + "/api/v1/files/" + fileName;
     }
 
 
-    public String  getImageByName(String imageName) {
-//        GeneratePresignedUrlRequest generatePresignedUrlRequest =
-//                new GeneratePresignedUrlRequest(BUCKET_NAME, imageName);
-
-        return "https://ar7imageserversit.sgp1.cdn.digitaloceanspaces.com/"+imageName;
+    public String getImageByName(String imageName) {
+        // Return CDN URL for the image
+        return cdnDomain + "/api/v1/files/" + imageName;
     }
 
-    public String  updateImage(MultipartFile file, String filename) throws IOException {
-
-        // Check if the file exists in the bucket
-        try {
-            // Try to retrieve the existing object
-            S3Object existS3Object = space.getObject(BUCKET_NAME, filename);
-
-            // If object exists, delete it
-            if (existS3Object != null) {
-                space.deleteObject(BUCKET_NAME, filename);
-            }
-        } catch (AmazonS3Exception e) {
-            // Handle the case where the file does not exist
-            if (e.getStatusCode() == 404) {
-                System.out.println("File does not exist, proceeding with upload.");
-            } else {
-                throw new IOException("Failed to check existence of the file in S3: " + e.getMessage());
-            }
+    public String updateImage(MultipartFile file, String filename) throws IOException {
+        // Ensure upload directory exists
+        Path uploadPath = ensureUploadDirectory();
+        
+        // Check if the file exists and delete it
+        Path existingFilePath = uploadPath.resolve(filename);
+        if (Files.exists(existingFilePath)) {
+            Files.delete(existingFilePath);
         }
-        String imageName = UUIDGenerator.generateUUID()+file.getOriginalFilename();
-        // Upload the new file with the same name
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentType(file.getContentType());
-        objectMetadata.setContentLength(file.getSize());
-        space.putObject(new PutObjectRequest(BUCKET_NAME, imageName, file.getInputStream(), objectMetadata)
-                .withCannedAcl(CannedAccessControlList.PublicRead));
+        
+        // Generate new unique file name
+        String imageName = UUIDGenerator.generateUUID() + file.getOriginalFilename();
+        
+        // Save the new file to local directory
+        Path filePath = uploadPath.resolve(imageName);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        
         return imageName;
-
     }
 
     public void deleteImage(String imageName) {
-        // Deletes the specified image from the "digizenger-image" bucket
-        space.deleteObject(BUCKET_NAME, imageName);
+        try {
+            // Delete file from local directory
+            Path filePath = Paths.get(uploadDir, imageName);
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to delete image: " + imageName, e);
+        }
     }
 }

@@ -139,9 +139,9 @@ public class GameTableServiceImpl implements GameTableService {
         if (request.getImage()!=null){
             if (gameTable.getImageName()!=null) {
                 gameTable.setImageName(storageService.updateImage(request.getImage(),gameTable.getImageName()));
+            } else {
+                gameTable.setImageName(storageService.uploadImage(request.getImage()));
             }
-            gameTable.setImageName(storageService.uploadImage(request.getImage()));
-
         }
 
         GameTable updatedGameTable = gameTableRepository.save(gameTable);

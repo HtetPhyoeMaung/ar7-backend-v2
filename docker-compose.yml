@@ -1,0 +1,67 @@
+services:
+  postgres-container:
+    image: postgres:15-alpine
+    container_name: postgres-container
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: ar7_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d ar7_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis-container:
+    image: redis:7-alpine
+    container_name: redis-container
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-container:5432/ar7_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_REDIS_HOST: redis-container
+      SPRING_REDIS_PORT: 6379
+    volumes:
+      - ./upload-dir:/app/upload-dir
+    depends_on:
+      postgres-container:
+        condition: service_healthy
+      redis-container:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "ps aux | grep '[j]ava.*ar7.jar' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local

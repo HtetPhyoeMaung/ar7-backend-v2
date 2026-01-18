@@ -31,7 +31,7 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "user", indexes = {
+@Table(name = "users", indexes = {
         @Index(name = "idx_user_ar7id", columnList = "ar7_id"),
         @Index(name = "idx_user_full_name", columnList = "full_name"),
         @Index(name = "idx_user_role", columnList = "role"),

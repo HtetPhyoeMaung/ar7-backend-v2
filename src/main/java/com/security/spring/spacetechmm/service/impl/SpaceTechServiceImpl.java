@@ -86,8 +86,9 @@ public class SpaceTechServiceImpl implements SpaceTechService {
         if (gameRequest.getImage()!=null) {
             if (spaceTechGame.getImageName()!=null) {
                 spaceTechGame.setImageName(storageService.updateImage(gameRequest.getImage(), spaceTechGame.getImageName()));
+            } else {
+                spaceTechGame.setImageName(storageService.uploadImage(gameRequest.getImage()));
             }
-            spaceTechGame.setImageName(storageService.uploadImage(gameRequest.getImage()));
         }
         spaceTechGame = spaceTechRepository.save(spaceTechGame);
         SpaceTechGameDto spaceTechGameDto = objectMapper.mapToSpaceTechGameDto(spaceTechGame);

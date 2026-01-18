@@ -159,42 +159,31 @@ SELECT 'AFFILIATEAGENT', '{"01000": "Dashboard", "02000": "Profile", "03000": "D
 FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM component WHERE role = 'AFFILIATEAGENT');
 
 -- Game Types
-INSERT INTO game_type (code, description, sort_number)
-SELECT 'SLOT', 'Slot', 1
-FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'SLOT');
+INSERT INTO game_type (id, code, description, sort_number)
+SELECT 1, 'SLOT', 'စလော့', 0
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE id = 1 OR code = 'SLOT');
 
-INSERT INTO game_type (code, description, sort_number)
-SELECT 'LIVE_CASINO', 'Live Casino', 2
-FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'LIVE_CASINO');
+INSERT INTO game_type (id, code, description, sort_number)
+SELECT 2, 'LIVE_CASINO', 'ကာစီနို', 0
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE id = 2 OR code = 'LIVE_CASINO');
 
-INSERT INTO game_type (code, description, sort_number)
-SELECT 'SPORT_BOOK', 'Sport Book', 3
-FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'SPORT_BOOK');
+INSERT INTO game_type (id, code, description, sort_number)
+SELECT 3, 'SPORT_BOOK', 'SPORT', 0
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE id = 3 OR code = 'SPORT_BOOK');
 
-INSERT INTO game_type (code, description, sort_number)
-SELECT 'VIRTUAL_SPORT', 'Virtual Sport', 4
-FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'VIRTUAL_SPORT');
+INSERT INTO game_type (id, code, description, sort_number)
+SELECT 8, 'FISHING', 'ငါးပစ်', 0
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE id = 8 OR code = 'FISHING');
 
-INSERT INTO game_type (code, description, sort_number)
-SELECT 'LOTTERY', 'Lottery', 5
-FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'LOTTERY');
+INSERT INTO game_type (id, code, description, sort_number)
+SELECT 11, 'ESPORT', 'ESPORT', 0
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE id = 11 OR code = 'ESPORT');
 
-INSERT INTO game_type (code, description, sort_number)
-SELECT 'QIPAI', 'Qipai', 6
-FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'QIPAI');
+INSERT INTO game_type (id, code, description, sort_number)
+SELECT 15, 'SHAN_BUGYI', 'ရှမ်း - ဘူကြီး', 0
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE id = 15 OR code = 'SHAN_BUGYI');
 
-INSERT INTO game_type (code, description, sort_number)
-SELECT 'P2P', 'P2P', 7
-FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'P2P');
-
-INSERT INTO game_type (code, description, sort_number)
-SELECT 'FISHING', 'Fishing', 8
-FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'FISHING');
-
-INSERT INTO game_type (code, description, sort_number)
-SELECT 'COCK_FIGHTING', 'Cock Fighting', 9
-FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'COCK_FIGHTING');
-
-INSERT INTO game_type (code, description, sort_number)
-SELECT 'BONUS', 'Bonus', 10
-FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'BONUS');
+-- Hot Games (Initial Data)
+INSERT INTO hot_games (id, game_name)
+SELECT 1, $${"africanBuffalo":[{"platform":"web","gameUrl":"https://new.buffalo789.com/","description":"African Buffalo","game_code":"b001","game_name":"African Buffalo","game_type":"slot","product_id":0,"product_code":2026,"image_url":"https://ar7imageserversit.sgp1.digitaloceanspaces.com/games/b001/5c2d8e2e-2a94-470b-95e8-f2fc838b7ccd.jpg","support_currency":"MMK","status":"ACTIVE"},{"platform":"web","gameUrl":"https://new.buffalo789.com/","description":"African Buffalo","game_code":"b001","game_name":"African Buffalo","game_type":"slot","product_id":0,"product_code":2026,"image_url":"https://ar7imageserversit.sgp1.digitaloceanspaces.com/games/b001/5c2d8e2e-2a94-470b-95e8-f2fc838b7ccd.jpg","support_currency":"MMK","status":"ACTIVE"},{"platform":"web","gameUrl":"https://scatter.buffalo789.com/","description":"African Buffalo Scatter","game_code":"b003","game_name":"African Buffalo","game_type":"slot","product_id":0,"product_code":2026,"image_url":"https://ar7imageserversit.sgp1.digitaloceanspaces.com/games/b001/759a936b-f776-4f86-9ac9-d5a427584f6f.png","support_currency":"MMK","status":"ACTIVE"},{"platform":"web","gameUrl":"https://scatter.buffalo789.com/","description":"African Buffalo Scatter","game_code":"b003","game_name":"African Buffalo","game_type":"slot","product_id":0,"product_code":2026,"image_url":"https://ar7imageserversit.sgp1.digitaloceanspaces.com/games/b001/759a936b-f776-4f86-9ac9-d5a427584f6f.png","support_currency":"MMK","status":"ACTIVE"},{"platform":"web","gameUrl":"https://buffalo789.com/","description":"African Buffalo Excluding 9","game_code":"b002","game_name":"African Buffalo","game_type":"slot","product_id":0,"product_code":2026,"image_url":"https://ar7imageserversit.sgp1.digitaloceanspaces.com/games/b001/759a936b-f776-4f86-9ac9-d5a427584f6f.png","support_currency":"MMK","status":"ACTIVE"},{"platform":"web","gameUrl":"https://buffalo789.com/","description":"African Buffalo Excluding 9","game_code":"b002","game_name":"African Buffalo","game_type":"slot","product_id":0,"product_code":2026,"image_url":"https://ar7imageserversit.sgp1.digitaloceanspaces.com/games/b001/759a936b-f776-4f86-9ac9-d5a427584f6f.png","support_currency":"MMK","status":"ACTIVE"},{"platform":"web","gameUrl":"https://buffalo789.com/","description":"African Buffalo Excluding 9","game_code":"b002","game_name":"African Buffalo","game_type":"slot","product_id":0,"product_code":2026,"image_url":"https://ar7imageserversit.sgp1.digitaloceanspaces.com/games/b001/759a936b-f776-4f86-9ac9-d5a427584f6f.png","support_currency":"MMK","status":"ACTIVE"},{"platform":"web","gameUrl":"https://buffalo789.com/","description":"African Buffalo Excluding 9","game_code":"b002","game_name":"African Buffalo","game_type":"slot","product_id":0,"product_code":2026,"image_url":"https://ar7imageserversit.sgp1.digitaloceanspaces.com/games/b001/759a936b-f776-4f86-9ac9-d5a427584f6f.png","support_currency":"MMK","status":"ACTIVE"},{"platform":"web","gameUrl":"https://buffalo789.com/","description":"African Buffalo Excluding 9","game_code":"b002","game_name":"African Buffalo","game_type":"slot","product_id":0,"product_code":2026,"image_url":"https://ar7imageserversit.sgp1.digitaloceanspaces.com/games/b001/759a936b-f776-4f86-9ac9-d5a427584f6f.png","support_currency":"MMK","status":"ACTIVE"}],"hotBuffalo":[{"game_code":"vswaysbufking","game_name":"Buffalo King Megaways","game_type":"SLOT","product_id":1185,"product_code":1006,"image_url":"https://images.gscplusmd.com/statics/production/images/games/1006/SLOT/vswaysbufking.png","support_currency":"NGN,COP,AOA,EUR,LBP,CAD,VND,USD,MYR,JPY,MXN,CHF,CZK,PHP,MMK,KRW,ETB,IRR,TND,BDT,IDR,BRL,THB,INR,KES","status":"ACTIVATED"},{"game_code":"vs4096bufking","game_name":"Buffalo King","game_type":"SLOT","product_id":1185,"product_code":1006,"image_url":"https://images.gscplusmd.com/statics/production/images/games/1006/SLOT/vs4096bufking.png","support_currency":"NGN,COP,AOA,EUR,LBP,CAD,VND,USD,MYR,JPY,MXN,CHF,CZK,PHP,MMK,KRW,ETB,IRR,TND,BDT,IDR,BRL,THB,INR,KES","status":"ACTIVATED"},{"game_code":"vswaysbkingasc","game_name":"Buffalo King Untamed Megaways","game_type":"SLOT","product_id":1185,"product_code":1006,"image_url":"https://images.gscplusmd.com/statics/production/images/games/1006/SLOT/vswaysbkingasc.png","support_currency":"NGN,COP,AOA,EUR,LBP,CAD,VND,USD,MYR,JPY,MXN,CHF,CZK,PHP,MMK,KRW,ETB,IRR,TND,BDT,IDR,BRL,THB,INR,KES","status":"ACTIVATED"},{"game_code":"108","game_name":"Buffalo Win","game_type":"SLOT","product_id":1141,"product_code":1007,"image_url":"https://images.gscplusmd.com/statics/production/images/games/1007/SLOT/108.png","support_currency":"IDR2","status":"ACTIVATED"},{"game_code":"14094","game_name":"Bull Treasure","game_type":"SLOT","product_id":1194,"product_code":1085,"image_url":"https://images.gscplusmd.com/statics/production/images/games/1085/SLOT/14094.png","support_currency":"MMK","status":"ACTIVATED"},{"game_code":"259","game_name":"Charge Buffalo ASCENT","game_type":"SLOT","product_id":1144,"product_code":1091,"image_url":"https://images.gscplusmd.com/statics/production/images/games/1091/SLOT/259.png","support_currency":"IDR,INR,MMK,THB,VND,USDT,HKD,NPR,JPY,PKR,USD,KHR2,KRW,VND2,LKR,IDR2,BDT,CNY,MYR,PHP,SGD","status":"ACTIVATED"},{"game_code":"259","game_name":"Charge Buffalo ASCENT","game_type":"SLOT","product_id":1144,"product_code":1091,"image_url":"https://images.gscplusmd.com/statics/production/images/games/1091/SLOT/259.png","support_currency":"IDR,INR,MMK,THB,VND,USDT,HKD,NPR,JPY,PKR,USD,KHR2,KRW,VND2,LKR,IDR2,BDT,CNY,MYR,PHP,SGD","status":"ACTIVATED"},{"game_code":"460","game_name":"3 Charge Buffalo","game_type":"SLOT","product_id":1144,"product_code":1091,"image_url":"https://images.gscplusmd.com/statics/production/images/games/1091/SLOT/460.png","support_currency":"IDR,INR,MMK,THB,VND,USDT,HKD,NPR,JPY,PKR,USD,KHR2,KRW,VND2,LKR,IDR2,BDT,CNY,MYR,PHP,SGD","status":"ACTIVATED"},{"game_code":"vs243chargebull","game_name":"Raging Bull","game_type":"SLOT","product_id":1185,"product_code":1006,"image_url":"https://images.gscplusmd.com/statics/production/images/games/1006/SLOT/vs243chargebull.png","support_currency":"NGN,COP,AOA,EUR,LBP,CAD,VND,USD,MYR,JPY,MXN,CHF,CZK,PHP,MMK,KRW,ETB,IRR,TND,BDT,IDR,BRL,THB,INR,KES","status":"ACTIVATED"},{"game_code":"vs25bullfiesta","game_name":"Bull Fiesta","game_type":"SLOT","product_id":1185,"product_code":1006,"image_url":"https://images.gscplusmd.com/statics/production/images/games/1006/SLOT/vs25bullfiesta.png","support_currency":"NGN,COP,AOA,EUR,LBP,CAD,VND,USD,MYR,JPY,MXN,CHF,CZK,PHP,MMK,KRW,ETB,IRR,TND,BDT,IDR,BRL,THB,INR,KES","status":"ACTIVATED"},{"game_code":"PSS-ON-00096","game_name":"FORTUNE BULL","game_type":"SLOT","product_id":1174,"product_code":1050,"image_url":"https://images.gscplusmd.com/statics/production/images/games/1050/SLOT/PSS-ON-00096.png","support_currency":"USD,HKD,KHR2,MAD,USDT,INR,MYR,KRW,SGD,CHF,LAK2,VND2,GBP,THB,MMK2,CAD,NZD,KHR,TND,CZK,SEK,IDR,VND,JPY,TRY,HUF,NOK,ZAR,ARS,BDT,IDR2,BRL,PHP,EUR,CNY,MMK","status":"ACTIVATED"},{"game_code":"vs20trswild2","game_name":"Black Bull","game_type":"SLOT","product_id":1185,"product_code":1006,"image_url":"https://images.gscplusmd.com/statics/production/images/games/1006/SLOT/vs20trswild2.png","support_currency":"NGN,COP,AOA,EUR,LBP,CAD,VND,USD,MYR,JPY,MXN,CHF,CZK,PHP,MMK,KRW,ETB,IRR,TND,BDT,IDR,BRL,THB,INR,KES","status":"ACTIVATED"},{"game_code":"14092","game_name":"Dragon Soar - Hyper Wild","game_type":"SLOT","product_id":1194,"product_code":1085,"image_url":"https://images.gscplusmd.com/statics/production/images/games/1085/SLOT/14092.png","support_currency":"MMK","status":"ACTIVATED"},{"game_code":"vswaysrhino","game_name":"Great Rhino Megaways","game_type":"SLOT","product_id":1185,"product_code":1006,"image_url":"https://images.gscplusmd.com/statics/production/images/games/1006/SLOT/vswaysrhino.png","support_currency":"NGN,COP,AOA,EUR,LBP,CAD,VND,USD,MYR,JPY,MXN,CHF,CZK,PHP,MMK,KRW,ETB,IRR,TND,BDT,IDR,BRL,THB,INR,KES","status":"ACTIVATED"},{"game_code":"vs20rhinoluxe","game_name":"Great Rhino Deluxe","game_type":"SLOT","product_id":1185,"product_code":1006,"image_url":"https://images.gscplusmd.com/statics/production/images/games/1006/SLOT/vs20rhinoluxe.png","support_currency":"NGN,COP,AOA,EUR,LBP,CAD,VND,USD,MYR,JPY,MXN,CHF,CZK,PHP,MMK,KRW,ETB,IRR,TND,BDT,IDR,BRL,THB,INR,KES","status":"ACTIVATED"},{"game_code":"485","game_name":"3 Coin Wild Horse","game_type":"SLOT","product_id":1144,"product_code":1091,"image_url":"https://images.gscplusmd.com/statics/production/images/games/1091/SLOT/485.png","support_currency":"IDR,INR,MMK,THB,VND,USDT,HKD,NPR,JPY,PKR,USD,KHR2,KRW,VND2,LKR,IDR2,BDT,CNY,MYR,PHP,SGD","status":"ACTIVATED"}],"hotSlot":[],"hotFishing":[],"hotMyanmarGame":[],"hotLiveCasino":[],"hotSport":[]}$$::jsonb::text
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM hot_games WHERE id = 1);

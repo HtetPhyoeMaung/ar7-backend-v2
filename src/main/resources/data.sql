@@ -157,3 +157,44 @@ FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM component WHERE role = 'A
 INSERT INTO component (role, permission_code)
 SELECT 'AFFILIATEAGENT', '{"01000": "Dashboard", "02000": "Profile", "03000": "DownLineUserList", "14000": "User Report"}'::json
 FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM component WHERE role = 'AFFILIATEAGENT');
+
+-- Game Types
+INSERT INTO game_type (code, description, sort_number)
+SELECT 'SLOT', 'Slot', 1
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'SLOT');
+
+INSERT INTO game_type (code, description, sort_number)
+SELECT 'LIVE_CASINO', 'Live Casino', 2
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'LIVE_CASINO');
+
+INSERT INTO game_type (code, description, sort_number)
+SELECT 'SPORT_BOOK', 'Sport Book', 3
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'SPORT_BOOK');
+
+INSERT INTO game_type (code, description, sort_number)
+SELECT 'VIRTUAL_SPORT', 'Virtual Sport', 4
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'VIRTUAL_SPORT');
+
+INSERT INTO game_type (code, description, sort_number)
+SELECT 'LOTTERY', 'Lottery', 5
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'LOTTERY');
+
+INSERT INTO game_type (code, description, sort_number)
+SELECT 'QIPAI', 'Qipai', 6
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'QIPAI');
+
+INSERT INTO game_type (code, description, sort_number)
+SELECT 'P2P', 'P2P', 7
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'P2P');
+
+INSERT INTO game_type (code, description, sort_number)
+SELECT 'FISHING', 'Fishing', 8
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'FISHING');
+
+INSERT INTO game_type (code, description, sort_number)
+SELECT 'COCK_FIGHTING', 'Cock Fighting', 9
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'COCK_FIGHTING');
+
+INSERT INTO game_type (code, description, sort_number)
+SELECT 'BONUS', 'Bonus', 10
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE code = 'BONUS');

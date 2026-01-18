@@ -7,18 +7,32 @@ import com.security.spring.thirdpartygames.gameprovider.dto.GameProviderObj;
 import com.security.spring.thirdpartygames.gameprovider.dto.GameProviderResponse;
 import com.security.spring.thirdpartygames.gameprovider.entity.GameSoftGameProvider;
 import com.security.spring.thirdpartygames.gameprovider.repository.GameProviderRepo;
+import com.security.spring.thirdpartygames.getProviderList.dto.ProviderDataFeign;
+import com.security.spring.thirdpartygames.getProviderList.dto.ProviderResponse;
 import com.security.spring.rro.GameSoftProviderRequest;
 import com.security.spring.storage.StorageService;
+import com.security.spring.utils.ConstantInformationForGameSoft;
+import com.security.spring.utils.SignUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class GameSoftProviderServiceImpl implements GameSoftGameProviderService {
@@ -27,6 +41,10 @@ public class GameSoftProviderServiceImpl implements GameSoftGameProviderService 
     private final GameProviderRepo gameProviderRepo;
     private final StorageService storageService;
     private final GameTypeRepo gameTypeRepo;
+    private final RestTemplate restTemplate;
+    private final ConstantInformationForGameSoft constantDataObj;
+
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     @Override
     @Transactional
@@ -216,6 +234,124 @@ public class GameSoftProviderServiceImpl implements GameSoftGameProviderService 
                 .statusCode(HttpStatus.OK.value())
                 .message("Successfully deleted provider by ID : "+providerId)
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public GameProviderResponse syncProviders() {
+        String methodName = "productlist";
+        String requestTime = LocalDateTime.now().format(formatter);
+        String operatorCode = constantDataObj.getOperatorCode();
+        String secretKey = constantDataObj.getSecretKey();
+        String apiUrl = constantDataObj.getApiUrl();
+        String thirdPartyRoute = apiUrl + "/api/operators/available-products";
+
+        String sign = SignUtil.createSignatureForRequest(operatorCode, Long.parseLong(requestTime), methodName, secretKey);
+        URI uri = UriComponentsBuilder.fromHttpUrl(thirdPartyRoute)
+                .queryParam("operator_code", operatorCode)
+                .queryParam("request_time", requestTime)
+                .queryParam("sign", sign)
+                .build()
+                .toUri();
+
+        log.info("Sync Providers Request URI: {}", uri);
+
+        ResponseEntity<List<ProviderDataFeign>> response;
+        int createdCount = 0;
+        int updatedCount = 0;
+        int skippedCount = 0;
+
+        try {
+            response = restTemplate.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<List<ProviderDataFeign>>() {
+                    });
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                List<ProviderDataFeign> providerListFromApi = response.getBody();
+                log.info("Received {} providers from API", providerListFromApi.size());
+
+                for (ProviderDataFeign providerDataFeign : providerListFromApi) {
+                    try {
+                        // Convert ProviderDataFeign to ProviderResponse.ProviderData
+                        ProviderResponse.ProviderData providerData = ProviderResponse.ProviderData.of(providerDataFeign);
+
+                        // Find or create GameType based on game_type from API
+                        Optional<GameType> gameTypeOpt = gameTypeRepo.findByCode(providerData.getGameType());
+                        if (gameTypeOpt.isEmpty()) {
+                            log.warn("GameType not found for code: {}. Skipping provider: {}", 
+                                    providerData.getGameType(), providerData.getProductName());
+                            skippedCount++;
+                            continue;
+                        }
+                        GameType gameType = gameTypeOpt.get();
+
+                        // Check if provider already exists (by product_id and game_type)
+                        Optional<GameSoftGameProvider> existingProviderOpt = 
+                                gameProviderRepo.findByProductAndGameType(providerData.getProductCode(), gameType);
+
+                        GameSoftGameProvider gameProvider;
+                        if (existingProviderOpt.isPresent()) {
+                            // Update existing provider
+                            gameProvider = existingProviderOpt.get();
+                            // Update fields from API response
+                            gameProvider.setCurrencyCode(providerData.getCurrency());
+                            gameProvider.setProductCode(providerData.getProductName());
+                            
+                            // Update conversion rate based on currency
+                            try {
+                                com.security.spring.thirdpartygames.callback.dto.Currency currency = 
+                                        com.security.spring.thirdpartygames.callback.dto.Currency.valueOf(providerData.getCurrency());
+                                gameProvider.setConversionRate(currency.getRate().doubleValue());
+                            } catch (IllegalArgumentException e) {
+                                log.warn("Currency not found: {}. Using default rate 1.0", providerData.getCurrency());
+                                gameProvider.setConversionRate(1.0);
+                            }
+                            
+                            gameProvider.setDeleted(false); // Ensure it's not marked as deleted
+                            updatedCount++;
+                        } else {
+                            // Create new provider using the entity's of method
+                            gameProvider = GameSoftGameProvider.of(providerData, gameType);
+                            createdCount++;
+                        }
+
+                        gameProviderRepo.save(gameProvider);
+                    } catch (Exception e) {
+                        log.error("Error processing provider: {}", providerDataFeign.getProductName(), e);
+                        skippedCount++;
+                    }
+                }
+
+                String message = String.format("Sync completed. Created: %d, Updated: %d, Skipped: %d", 
+                        createdCount, updatedCount, skippedCount);
+                log.info(message);
+
+                return GameProviderResponse
+                        .builder()
+                        .status(true)
+                        .statusCode(HttpStatus.OK.value())
+                        .message(message)
+                        .build();
+            } else {
+                return GameProviderResponse
+                        .builder()
+                        .status(false)
+                        .statusCode(response.getStatusCode().value())
+                        .message("Failed to fetch providers from API")
+                        .build();
+            }
+        } catch (Exception e) {
+            log.error("Error syncing providers", e);
+            return GameProviderResponse
+                    .builder()
+                    .status(false)
+                    .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .message("Error syncing providers: " + e.getMessage())
+                    .build();
+        }
     }
 
 }

@@ -79,4 +79,10 @@ public class GameSoftGameProductController {
         GameProviderResponse resObj = gameSoftGameProviderService.updateGameProvider(id,data);
         return ResponseEntity.ok().body(resObj);
     }
+
+    @PostMapping("/gameprovider/sync")
+    public ResponseEntity<GameProviderResponse> syncProviders() {
+        GameProviderResponse response = gameSoftGameProviderService.syncProviders();
+        return ResponseEntity.ok(response);
+    }
 }

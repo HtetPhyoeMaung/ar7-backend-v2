@@ -16,4 +16,6 @@ public interface GameSoftGameProviderService {
      GameProviderResponse getGameProviderByGameType(Integer gameTypeId);
 
      GameProviderResponse deleteProviderById(int providerId);
+
+     GameProviderResponse syncProviders();
 }

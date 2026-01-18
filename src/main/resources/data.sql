@@ -10,6 +10,7 @@ INSERT INTO units (id, main_unit, game_unit, promotion_unit, tickets, turn_amoun
 (999992, 0, 0, 0, 0, 0, 0), (999993, 0, 0, 0, 0, 0, 0), -- SeniorMaster
 (999994, 0, 0, 0, 0, 0, 0), (999995, 0, 0, 0, 0, 0, 0), -- Master
 (999996, 0, 0, 0, 0, 0, 0), (999997, 0, 0, 0, 0, 0, 0), -- AffiliateAgent
+(999969, 0, 0, 0, 0, 0, 0), (999968, 0, 0, 0, 0, 0, 0), -- AffiliateAgent (RED, GOL)
 (999998, 0, 0, 0, 0, 0, 0), (999999, 0, 0, 0, 0, 0, 0), -- Agent
 (999981, 0, 0, 0, 0, 0, 0), (999982, 0, 0, 0, 0, 0, 0), (999983, 0, 0, 0, 0, 0, 0),
 (999984, 0, 0, 0, 0, 0, 0), (999985, 0, 0, 0, 0, 0, 0), (999986, 0, 0, 0, 0, 0, 0),
@@ -49,6 +50,14 @@ FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM users WHERE code = 'DEV')
 INSERT INTO users (full_name, ar7_id, password, role, code, secret_code, status, unit_id, streamer, parent_user_id)
 SELECT 'AffiliateAgent Default', 'AFG0000009', '$2a$12$Wy3EWzVmGvHqosJTpeIoTO0ELkT.CGUjYeuygVw/lCvEnvIXpN0hK', 'AFFILIATEAGENT', '009', '123456', true, 999997, false, 'AG0000009'
 FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM users WHERE code = '009');
+
+INSERT INTO users (full_name, ar7_id, password, role, code, secret_code, status, unit_id, streamer, parent_user_id)
+SELECT 'AffiliateAgent RED', 'AFG0000002', '$2a$12$Wy3EWzVmGvHqosJTpeIoTO0ELkT.CGUjYeuygVw/lCvEnvIXpN0hK', 'AFFILIATEAGENT', 'RED', '123456', true, 999969, false, 'AG0000009'
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM users WHERE code = 'RED');
+
+INSERT INTO users (full_name, ar7_id, password, role, code, secret_code, status, unit_id, streamer, parent_user_id)
+SELECT 'AffiliateAgent GOL', 'AFG0000003', '$2a$12$Wy3EWzVmGvHqosJTpeIoTO0ELkT.CGUjYeuygVw/lCvEnvIXpN0hK', 'AFFILIATEAGENT', 'GOL', '123456', true, 999968, false, 'AG0000009'
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM users WHERE code = 'GOL');
 
 -- Agent (AG)
 INSERT INTO users (full_name, ar7_id, password, role, secret_code, status, unit_id, streamer)

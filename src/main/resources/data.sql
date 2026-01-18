@@ -10,7 +10,6 @@ INSERT INTO units (id, main_unit, game_unit, promotion_unit, tickets, turn_amoun
 (999992, 0, 0, 0, 0, 0, 0), (999993, 0, 0, 0, 0, 0, 0), -- SeniorMaster
 (999994, 0, 0, 0, 0, 0, 0), (999995, 0, 0, 0, 0, 0, 0), -- Master
 (999996, 0, 0, 0, 0, 0, 0), (999997, 0, 0, 0, 0, 0, 0), -- AffiliateAgent
-(999969, 0, 0, 0, 0, 0, 0), (999968, 0, 0, 0, 0, 0, 0), -- AffiliateAgent (RED, GOL)
 (999998, 0, 0, 0, 0, 0, 0), (999999, 0, 0, 0, 0, 0, 0), -- Agent
 (999981, 0, 0, 0, 0, 0, 0), (999982, 0, 0, 0, 0, 0, 0), (999983, 0, 0, 0, 0, 0, 0),
 (999984, 0, 0, 0, 0, 0, 0), (999985, 0, 0, 0, 0, 0, 0), (999986, 0, 0, 0, 0, 0, 0),
@@ -18,6 +17,15 @@ INSERT INTO units (id, main_unit, game_unit, promotion_unit, tickets, turn_amoun
 (999971, 0, 0, 0, 0, 0, 0), (999972, 0, 0, 0, 0, 0, 0), (999973, 0, 0, 0, 0, 0, 0),
 (999974, 0, 0, 0, 0, 0, 0), (999975, 0, 0, 0, 0, 0, 0), (999976, 0, 0, 0, 0, 0, 0),
 (999977, 0, 0, 0, 0, 0, 0), (999978, 0, 0, 0, 0, 0, 0), (999979, 0, 0, 0, 0, 0, 0); -- Streamers
+
+-- Additional units for AffiliateAgent RED and GOL
+INSERT INTO units (id, main_unit, game_unit, promotion_unit, tickets, turn_amount, total_bet_unit)
+SELECT 999969, 0, 0, 0, 0, 0, 0
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM units WHERE id = 999969);
+
+INSERT INTO units (id, main_unit, game_unit, promotion_unit, tickets, turn_amount, total_bet_unit)
+SELECT 999968, 0, 0, 0, 0, 0, 0
+FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM units WHERE id = 999968);
 
 -- Admin
 INSERT INTO users (full_name, ar7_id, password, role, secret_code, status, unit_id, streamer)

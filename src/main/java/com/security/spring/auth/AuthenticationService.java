@@ -290,7 +290,7 @@ public class AuthenticationService {
                 .parentAr7Id(user.getParentUserId())
                 .secretCode(user.getSecretCode())
                 .role(user.getRole())
-                .component(component.getPermissionCode())
+                .component(component != null ? component.getPermissionCode() : null)
                 .ar7Id(user.getAr7Id())
                 .status(true)
                 .build();

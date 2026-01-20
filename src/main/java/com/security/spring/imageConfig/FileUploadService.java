@@ -37,15 +37,21 @@ public class FileUploadService {
                 Files.createDirectories(folderPath);
             }
 
-            // Generate unique file name
-            String fileName = UUID.randomUUID().toString() + "_" + name;
+            // Generate unique file name - preserve original file extension
+            String originalFilename = file.getOriginalFilename();
+            String fileExtension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+            String fileName = UUID.randomUUID().toString() + "_" + name + fileExtension;
             Path filePath = folderPath.resolve(fileName);
 
             // Save file to local directory
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            // Return CDN URL
-            String relativePath = folderName + "/" + fileName;
+            // Return CDN URL - normalize folderName to remove trailing slashes
+            String normalizedFolderName = folderName.endsWith("/") ? folderName.substring(0, folderName.length() - 1) : folderName;
+            String relativePath = normalizedFolderName + "/" + fileName;
             String fileUrl = cdnDomain + "/api/v1/files/" + relativePath;
             logger.info("File uploaded successfully: {}", fileUrl);
             return fileUrl;

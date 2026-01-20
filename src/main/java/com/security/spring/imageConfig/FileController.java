@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -29,6 +31,9 @@ public class FileController {
             String requestURI = request.getRequestURI();
             String pathPrefix = "/api/v1/files/";
             String relativePath = requestURI.substring(requestURI.indexOf(pathPrefix) + pathPrefix.length());
+            
+            // URL decode the path to handle encoded characters (e.g., %20 for spaces)
+            relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
             
             // Build the file path - prevent directory traversal
             Path filePath = Paths.get(uploadDir, relativePath).normalize();

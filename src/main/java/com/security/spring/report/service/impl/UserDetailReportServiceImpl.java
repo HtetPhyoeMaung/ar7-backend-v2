@@ -46,7 +46,7 @@ public class UserDetailReportServiceImpl implements UserDetailReportService {
         String status = hasDateRange ? "SETTLED" : null;
 
         List<UserReportObj> userReportObjList = gameSoftTransactionRepo
-                .aggregateUserReport(user, status, startDate, endDate)
+                .aggregateUserReport(user.getUserId() != null ? user.getUserId() : null, status, startDate, endDate)
                 .stream()
                 .map(obj -> {
                     double winLoseAmount = obj.getTotalWinAmount() - obj.getTotalBetAmount();

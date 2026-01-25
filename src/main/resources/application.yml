@@ -44,8 +44,26 @@ file:
   upload-dir: ./upload-dir
   cdn:
     domain: https://ar7myanmar.com
+management:
+  tracing:
+    sampling:
+      # Trace only 10% of interactions to protect your 4GB RAM
+      probability: 0.1
+    baggage:
+      enabled: true
+  zipkin:
+    tracing:
+      # Uses the container name defined in your docker-compose
+      endpoint: "http://zipkin-container:9411/api/v2/spans"
+  endpoints:
+    web:
+      exposure:
+        # Ensures tracing endpoints are visible to management tools
+        include: "health,info,metrics,tracing"
 
 logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
   level:
     org:
       springframework.jdbc.core: TRACE

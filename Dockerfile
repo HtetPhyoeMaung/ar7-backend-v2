@@ -10,4 +10,4 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar ar7.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "ar7.jar"]
+ENTRYPOINT ["java", "-Xms512m", "-Xmx1024m", "-XX:+UseG1GC", "-jar", "ar7.jar"]

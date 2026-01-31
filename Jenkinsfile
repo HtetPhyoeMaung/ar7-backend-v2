@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         APP_NAME = 'AR7 API Server'
-        PROD_IP = '987.654.32.10'
+        PROD_IP = '157.245.201.136'
         SSH_CRED_ID = 'ar7-server-ssh-key'
     }
 

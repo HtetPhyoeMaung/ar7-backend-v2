@@ -23,8 +23,12 @@ pipeline {
                         echo "Connecting to Production Server: ${env.PROD_IP}"
                         
                         sh """
-                            ssh -o StrictHostKeyChecking=no root@${env.PROD_IP} \
-                            "cd ar7-app && git pull && docker compose up -d --build"
+                            ssh -o StrictHostKeyChecking=no root@${env.PROD_IP} "
+                            cd ar7-backend-v2 && \
+                            git pull origin master && \
+                            docker compose up -d --build && \
+                            echo '--- Streaming backend-app logs for 15 seconds ---' && \
+                            timeout 15s docker logs -f backend-app || true"
                         """
                     }
                 }

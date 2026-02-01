@@ -32,7 +32,7 @@ public class DigitalOceanSpaceConfig {
     private String region;
 
     @Bean
-    public AmazonS3 getS3Client() {
+    AmazonS3 getS3Client() {
         BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         return AmazonS3ClientBuilder.standard()
                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint, region))

@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class GameSoftConfig {
 
     @Bean
-    public ConstantInformationForGameSoft constantInformationForGameSoft() {
+    ConstantInformationForGameSoft constantInformationForGameSoft() {
         return ConstantInformationForGameSoft.builder().build();
     }
 }

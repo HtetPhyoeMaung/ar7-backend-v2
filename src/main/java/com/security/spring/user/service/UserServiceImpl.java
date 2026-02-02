@@ -92,10 +92,24 @@ public class UserServiceImpl implements UserService{
     @Transactional
     public Page<UserResponseObj> getUserByRole(Role role, String searchData, Pageable pageable) {
         Page<User> userPage;
-        if(searchData == null){
-            userPage = userRepo.findByRole(role,pageable);
-        }else {
-            userPage = userRepo.findByRoleAndAr7IdContainingIgnoreCase(role,searchData,pageable);
+        Optional<User> currentUserOpt = userRepo.findByAr7Id(ContextUtils.getAr7IdFromContext());
+        boolean isAgentOrAffiliateAgent = currentUserOpt
+                .map(u -> u.getRole() == Role.AGENT || u.getRole() == Role.AFFILIATEAGENT)
+                .orElse(false);
+
+        if (role == Role.USER && isAgentOrAffiliateAgent && currentUserOpt.isPresent()) {
+            String currentUserAr7Id = currentUserOpt.get().getAr7Id();
+            if (searchData == null) {
+                userPage = userRepo.findByParentUserIdAndRole(currentUserAr7Id, role, pageable);
+            } else {
+                userPage = userRepo.findByParentUserIdAndRoleAndAr7IdContainingIgnoreCase(currentUserAr7Id, role, searchData, pageable);
+            }
+        } else {
+            if (searchData == null) {
+                userPage = userRepo.findByRole(role, pageable);
+            } else {
+                userPage = userRepo.findByRoleAndAr7IdContainingIgnoreCase(role, searchData, pageable);
+            }
         }
 
         return userPage.map(data ->{
@@ -107,6 +121,7 @@ public class UserServiceImpl implements UserService{
                     .role(data.getRole())
                     .lastLoginTime(data.getLoginTime())
                     .profileImage(null)
+                    .code(data.getRole().equals(Role.USER) ? data.getCode() : null)
                     .userStatus(data.getStatus())
                     .userUnits(data.getUserUnits())
 //                .userComession(data.getUserComession())

@@ -121,7 +121,7 @@ public class UserServiceImpl implements UserService{
                     .role(data.getRole())
                     .lastLoginTime(data.getLoginTime())
                     .profileImage(null)
-                    .code(data.getRole().equals(Role.USER) ? data.getCode() : null)
+                    .promoCode(data.getRole().equals(Role.USER) ? data.getPromoCode() : null)
                     .userStatus(data.getStatus())
                     .userUnits(data.getUserUnits())
 //                .userComession(data.getUserComession())

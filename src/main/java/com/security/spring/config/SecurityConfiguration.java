@@ -58,7 +58,9 @@ public class SecurityConfiguration {
                         "/api/v1/files/**",
                         "/api/test/**",
                          "/download/**",
-                         "/api/v1/shan/**"
+                         "/api/v1/shan/**",
+                        "/api/v1/app-manager/apps/*/download",
+                        "/api/v1/app-manager/apps/*/version"
                          ,"/api/v1/game-bank/seamless/**"
 //                        "/api/v1/gt/**",
 //                        "/api/v1/gameproduct/**"

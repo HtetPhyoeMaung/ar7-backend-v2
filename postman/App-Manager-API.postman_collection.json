@@ -1,0 +1,128 @@
+{
+	"info": {
+		"_postman_id": "app-manager-ar7-collection",
+		"name": "App Manager API",
+		"description": "Upload, get version, download, and update apps (e.g. APK).\n\n- **Upload** and **Update** require ADMIN role (add JWT in Authorization header).\n- **Get version** and **Download** are public.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080"
+		},
+		{
+			"key": "appName",
+			"value": "ar7"
+		},
+		{
+			"key": "version",
+			"value": "1.0.0"
+		}
+	],
+	"item": [
+		{
+			"name": "Upload app",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"description": "Required for ADMIN (upload)"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "appName",
+							"value": "{{appName}}",
+							"type": "text",
+							"description": "App identifier (e.g. ar7)"
+						},
+						{
+							"key": "version",
+							"value": "{{version}}",
+							"type": "text",
+							"description": "Version string (e.g. 1.0.0)"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": [],
+							"description": "APK or app file"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/app-manager/apps",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "v1", "app-manager", "apps"]
+				},
+				"description": "Upload an app with app name and version. Replaces existing app if same name. Requires ADMIN."
+			}
+		},
+		{
+			"name": "Get version by app name",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/app-manager/apps/{{appName}}/version",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "v1", "app-manager", "apps", "{{appName}}", "version"]
+				},
+				"description": "Returns current version info for the given app name. Public."
+			}
+		},
+		{
+			"name": "Download app",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/app-manager/apps/{{appName}}/download",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "v1", "app-manager", "apps", "{{appName}}", "download"]
+				},
+				"description": "Download the app file by app name. Public. Save response as file."
+			}
+		},
+		{
+			"name": "Update app",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"description": "Required for ADMIN (update)"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "version",
+							"value": "{{version}}",
+							"type": "text",
+							"description": "Optional new version string"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": [],
+							"description": "New APK or app file"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/app-manager/apps/{{appName}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "v1", "app-manager", "apps", "{{appName}}"]
+				},
+				"description": "Update the app file and optionally version. Requires ADMIN."
+			}
+		}
+	]
+}

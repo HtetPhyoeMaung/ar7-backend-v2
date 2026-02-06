@@ -70,6 +70,9 @@ public class SecurityConfiguration {
 
                                 .requestMatchers("api/v1/dashboard/ads/**").hasRole(ADMIN.name())
                                 .requestMatchers("api/v1/ads/**").permitAll()
+                .requestMatchers(GET, "/api/v1/app-manager/apps/**").permitAll()
+                .requestMatchers(POST, "/api/v1/app-manager/apps").hasRole(ADMIN.name())
+                .requestMatchers(PUT, "/api/v1/app-manager/apps/**").hasRole(ADMIN.name())
 
                 // /api/v1/user end point all
                 .requestMatchers("api/v1/user/**").hasAnyRole(ADMIN.name(), SENIORMASTER.name(), MASTER.name(),AGENT.name(),USER.name(), AFFILIATEAGENT.name())

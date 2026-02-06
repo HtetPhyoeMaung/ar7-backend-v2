@@ -116,4 +116,51 @@ public class StorageService {
             throw new RuntimeException("Failed to delete image: " + imageName, e);
         }
     }
+
+    /**
+     * Upload app file (e.g. APK) under apps/{appName}/. Returns relative path from uploadDir.
+     */
+    public String uploadAppFile(MultipartFile file, String appName) throws IOException {
+        Path uploadPath = ensureUploadDirectory();
+        String safeAppName = appName.replaceAll("[^a-zA-Z0-9_-]", "_");
+        Path appDir = uploadPath.resolve("apps").resolve(safeAppName);
+        if (!Files.exists(appDir)) {
+            Files.createDirectories(appDir);
+        }
+        String originalFilename = file.getOriginalFilename();
+        String fileName = (originalFilename != null && !originalFilename.isBlank())
+                ? originalFilename
+                : "app.apk";
+        Path filePath = appDir.resolve(fileName);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        return "apps/" + safeAppName + "/" + fileName;
+    }
+
+    /**
+     * Replace existing app file. relativePath is e.g. "apps/ar7/ar7.apk".
+     */
+    public String updateAppFile(MultipartFile file, String relativePath) throws IOException {
+        Path fullPath = Paths.get(uploadDir, relativePath).normalize();
+        Path uploadPath = Paths.get(uploadDir).normalize();
+        if (!fullPath.startsWith(uploadPath) || !Files.exists(fullPath)) {
+            throw new IOException("Invalid or missing app file path: " + relativePath);
+        }
+        Files.copy(file.getInputStream(), fullPath, StandardCopyOption.REPLACE_EXISTING);
+        return relativePath;
+    }
+
+    public Path getAppFilePath(String relativePath) {
+        return Paths.get(uploadDir, relativePath).normalize();
+    }
+
+    public void deleteFileByRelativePath(String relativePath) throws IOException {
+        Path filePath = Paths.get(uploadDir, relativePath).normalize();
+        Path uploadPath = Paths.get(uploadDir).normalize();
+        if (!filePath.startsWith(uploadPath)) {
+            throw new IOException("Invalid path: " + relativePath);
+        }
+        if (Files.exists(filePath)) {
+            Files.delete(filePath);
+        }
+    }
 }

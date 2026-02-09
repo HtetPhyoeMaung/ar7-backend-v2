@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
+@Repository("appManagerAppVersionRepository")
 public interface AppVersionRepository extends JpaRepository<AppVersion, Long> {
 
     Optional<AppVersion> findByAppName(String appName);

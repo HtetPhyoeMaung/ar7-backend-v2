@@ -6,12 +6,12 @@ import com.security.spring.appmanager.repo.AppVersionRepository;
 import com.security.spring.appmanager.service.AppManagerService;
 import com.security.spring.exceptionall.DataNotFoundException;
 import com.security.spring.storage.StorageService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,11 +20,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 @Service
-@RequiredArgsConstructor
 public class AppManagerServiceImpl implements AppManagerService {
 
     private final AppVersionRepository appVersionRepository;
     private final StorageService storageService;
+
+    public AppManagerServiceImpl(
+            @Qualifier("appManagerAppVersionRepository") AppVersionRepository appVersionRepository,
+            StorageService storageService) {
+        this.appVersionRepository = appVersionRepository;
+        this.storageService = storageService;
+    }
 
     @Override
     public AppVersionResponse uploadApp(String appName, String version, MultipartFile file) throws IOException {

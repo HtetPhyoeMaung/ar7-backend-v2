@@ -1,0 +1,97 @@
+{
+  "info": {
+    "_postman_id": "app-ar7-api-collection",
+    "name": "App API",
+    "description": "Upload, update, version check, and list APKs with download links.\n\nBase path: /api/v1/app",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8080"},
+    {"key": "appKey", "value": "ar7"},
+    {"key": "versionName", "value": "1.0.0"},
+    {"key": "versionCode", "value": "1"},
+    {"key": "releaseNotes", "value": "Initial release"},
+    {"key": "token", "value": ""}
+  ],
+  "item": [
+    {
+      "name": "Upload app APK",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{token}}", "description": "Required if protected by auth"}
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {"key": "appKey", "value": "{{appKey}}", "type": "text", "description": "App identifier (default: ar7)"},
+            {"key": "versionName", "value": "{{versionName}}", "type": "text", "description": "Version string (e.g. 1.0.0)"},
+            {"key": "versionCode", "value": "{{versionCode}}", "type": "text", "description": "Version code (integer)"},
+            {"key": "releaseNotes", "value": "{{releaseNotes}}", "type": "text", "description": "Optional release notes"},
+            {"key": "apk", "type": "file", "src": [], "description": "APK file (required)"}
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/app/upload",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "app", "upload"]
+        },
+        "description": "Upload a new app APK and register version info."
+      }
+    },
+    {
+      "name": "Update app APK",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{token}}", "description": "Required if protected by auth"}
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {"key": "appKey", "value": "{{appKey}}", "type": "text", "description": "App identifier (default: ar7)"},
+            {"key": "versionName", "value": "{{versionName}}", "type": "text", "description": "New version string"},
+            {"key": "versionCode", "value": "{{versionCode}}", "type": "text", "description": "New version code (integer)"},
+            {"key": "releaseNotes", "value": "{{releaseNotes}}", "type": "text", "description": "Optional release notes"},
+            {"key": "apk", "type": "file", "src": [], "description": "New APK file (required)"}
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/app/update",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "app", "update"]
+        },
+        "description": "Update existing app with new APK and version info."
+      }
+    },
+    {
+      "name": "Check app version",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/app/version?appKey={{appKey}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "app", "version"],
+          "query": [
+            {"key": "appKey", "value": "{{appKey}}", "description": "App identifier (default: ar7)"}
+          ]
+        },
+        "description": "Get current app version info for the given app key. Returns version details with download URL."
+      }
+    },
+    {
+      "name": "Get APK list",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/app/list",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "app", "list"]
+        },
+        "description": "Get list of all registered APKs with download links."
+      }
+    }
+  ]
+}

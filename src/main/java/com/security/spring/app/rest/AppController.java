@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/app")
 @RequiredArgsConstructor
@@ -49,5 +51,11 @@ public class AppController {
             @RequestParam(value = "appKey", required = false) String appKey) {
         AppVersionResponse response = appService.checkVersion(appKey);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/list")
+    @Operation(summary = "Get APK list", description = "Get list of all registered APKs with download links")
+    public ResponseEntity<List<AppVersionResponse>> getApkList() {
+        return ResponseEntity.ok(appService.getApkList());
     }
 }

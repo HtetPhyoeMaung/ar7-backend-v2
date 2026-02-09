@@ -13,6 +13,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -95,6 +96,13 @@ public class AppServiceImpl implements AppService {
         AppVersion version = appVersionRepository.findByAppKey(effectiveKey)
                 .orElseThrow(() -> new IllegalArgumentException("App not found for key: " + effectiveKey));
         return toResponse(version);
+    }
+
+    @Override
+    public List<AppVersionResponse> getApkList() {
+        return appVersionRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     private void validateApkFile(MultipartFile apkFile) {

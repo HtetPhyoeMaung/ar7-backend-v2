@@ -96,5 +96,13 @@ public class AdsServiceImpl implements AdsService {
         return ResponseEntity.ok(response);
     }
 
-
+    @Override
+    public ResponseEntity<CustomResponse<AdsResponse>> getAllAds() {
+        List<Ads> adsList = adsRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+        CustomResponse<AdsResponse> response = new CustomResponse<>();
+        response.setStatus(true);
+        response.setMessage(Constraint.RETRIEVE_SUCCESS_MESSAGE);
+        response.setData(adsList.stream().map(objectMapper::mapToAdsResponse).toList());
+        return ResponseEntity.ok(response);
+    }
 }

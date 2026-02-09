@@ -19,6 +19,11 @@ public class AdsDashBoardController {
 
     private final AdsService adsService;
 
+    @GetMapping
+    public ResponseEntity<CustomResponse<AdsResponse>> listAllAds() {
+        return adsService.getAllAds();
+    }
+
     @PostMapping
     public ResponseEntity<CustomResponse<AdsResponse>> createAds(
             @RequestParam(name = "text", required = false) String text,

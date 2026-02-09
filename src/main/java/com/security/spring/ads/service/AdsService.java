@@ -18,4 +18,6 @@ public interface AdsService {
     ResponseEntity<AdsResponse> searchById(Long id);
 
     ResponseEntity<CustomResponse<AdsResponse>> getListAds(Ads.AdsType type, Ads.ViewType viewType);
+
+    ResponseEntity<CustomResponse<AdsResponse>> getAllAds();
 }

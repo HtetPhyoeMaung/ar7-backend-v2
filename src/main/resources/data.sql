@@ -193,10 +193,6 @@ SELECT 8, 'FISHING', 'ငါးပစ်', 0
 FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE id = 8 OR code = 'FISHING');
 
 INSERT INTO game_type (id, code, description, sort_number)
-SELECT 11, 'ESPORT', 'ESPORT', 0
-FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE id = 11 OR code = 'ESPORT');
-
-INSERT INTO game_type (id, code, description, sort_number)
 SELECT 15, 'SHAN_BUGYI', 'ရှမ်း - ဘူကြီး', 0
 FROM (SELECT 1) AS tmp WHERE NOT EXISTS (SELECT 1 FROM game_type WHERE id = 15 OR code = 'SHAN_BUGYI');
 

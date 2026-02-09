@@ -1,5 +1,20 @@
 package com.security.spring.thirdpartygames.getGameList.service;
 
+import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -17,23 +32,13 @@ import com.security.spring.thirdpartygames.getGameList.dto.GameListResponse;
 import com.security.spring.thirdpartygames.getGameList.dto.GetGameListRequest;
 import com.security.spring.thirdpartygames.getGameList.dto.GetGameListResponse;
 import com.security.spring.thirdpartygames.getGameList.dto.ProviderGame;
-import com.security.spring.user.entity.User;
 import com.security.spring.user.repository.UserRepository;
 import com.security.spring.utils.ConstantInformationForGameSoft;
 import com.security.spring.utils.ErrorMessageUtil;
 import com.security.spring.utils.SignUtil;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.*;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import java.net.URI;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -53,6 +58,16 @@ public class GetGameListServiceImpl implements GetGameListService {
     @Transactional
     public GetGameListResponse getGameListConfig(GetGameListRequest data, String ar7id) throws JsonMappingException, JsonProcessingException {
         userRepository.findByAr7Id(ar7id).orElseThrow(() -> new ApiMemberDoesNotExist(ErrorMessageUtil.API_MEMBER_NOT_EXISTS));
+        return fetchGameList(data);
+    }
+
+    @Override
+    @Transactional
+    public GetGameListResponse getGameListConfigSystem(GetGameListRequest data) throws JsonMappingException, JsonProcessingException {
+        return fetchGameList(data);
+    }
+
+    private GetGameListResponse fetchGameList(GetGameListRequest data) throws JsonProcessingException {
         String methodName = "gamelist";
         String requestTime = LocalDateTime.now().format(formatter);
         String operatorCode = constantDataObj.getOperatorCode();
@@ -116,17 +131,21 @@ public class GetGameListServiceImpl implements GetGameListService {
             // Send GET request
             response = restTemplate.getForEntity(uri, GameListResponse.class);
         }
-        // Get provider info
-        GameType gameTypeObj = gameTypeRepo.findByCode(data.getGameType()).orElseThrow(() ->
-                new DataNotFoundException("GameType not found by Description : " + data.getGameType()));
-        GameSoftGameProvider gameSoftGameProvider = gameProviderRepo.findByProductAndGameType(
-                (long) data.getProductID(), gameTypeObj).orElseThrow(() ->
-                new DataNotFoundException("GameProvider not found by Product and GameType."));
+        GameSoftGameProvider gameSoftGameProvider = null;
+        if(!data.isFromHotGame()) {
+        	 // Get provider info
+            GameType gameTypeObj = gameTypeRepo.findByCode(data.getGameType()).orElseThrow(() ->
+                    new DataNotFoundException("GameType not found by Description : " + data.getGameType()));
+            gameSoftGameProvider = gameProviderRepo.findByProductAndGameType(
+                    (long) data.getProductID(), gameTypeObj).orElseThrow(() ->
+                    new DataNotFoundException("GameProvider not found by Product and GameType."));
+		}
 
         log.info("Get Game List Response: {}", response.getBody());
         return GetGameListResponse.builder()
-                .gameListResponse(response.getBody())
-                .productName(gameSoftGameProvider.getProductCode())
-                .build();
+        .gameListResponse(response.getBody())
+        // If provider is null (like in HotGame requests), just put null or empty string
+        .productName(gameSoftGameProvider != null ? gameSoftGameProvider.getProductCode() : "")
+        .build();
     }
 }

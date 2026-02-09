@@ -7,5 +7,5 @@ import com.security.spring.thirdpartygames.getGameList.dto.GetGameListResponse;
 
 public interface GetGameListService {
      GetGameListResponse getGameListConfig(GetGameListRequest data,String ar7id) throws JsonMappingException, JsonProcessingException;
-
+     GetGameListResponse getGameListConfigSystem(GetGameListRequest data) throws JsonMappingException, JsonProcessingException;
 }

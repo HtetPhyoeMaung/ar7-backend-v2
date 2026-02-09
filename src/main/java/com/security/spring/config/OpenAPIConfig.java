@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
                 contact = @Contact(
                         name = "AR7",
                         email = "ar7@gmail.com",
-                        url="https://myanmaronlinegameclub.com/"
+                        url="https://ar7.org"
                 ),
                 description = "This API is Gambling Game Admin Service With Spring Boot",
                 title="AR7 - Game Application",
@@ -34,7 +34,11 @@ import io.swagger.v3.oas.annotations.servers.Server;
                 @Server(
                         description = "SIT Environment",
                         url = "https://myanmaronlinegameclub.com/"
-                )
+                ),
+                @Server(
+                		description = "Production Environment",
+                		url = "https://ar7myanmar.com/"
+                		)
         }
 )
 

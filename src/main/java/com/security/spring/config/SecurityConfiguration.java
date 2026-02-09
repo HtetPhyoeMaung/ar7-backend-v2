@@ -58,8 +58,9 @@ public class SecurityConfiguration {
                         "/api/v1/files/**",
                         "/api/test/**",
                          "/download/**",
-                        "/api/v1/app/**",
-                         "/api/v1/shan/**"
+                         "/api/v1/shan/**",
+                        "/api/v1/app-manager/apps/*/download",
+                        "/api/v1/app-manager/apps/*/version"
                          ,"/api/v1/game-bank/seamless/**"
 //                        "/api/v1/gt/**",
 //                        "/api/v1/gameproduct/**"
@@ -71,6 +72,9 @@ public class SecurityConfiguration {
 
                                 .requestMatchers("api/v1/dashboard/ads/**").hasRole(ADMIN.name())
                                 .requestMatchers("api/v1/ads/**").permitAll()
+                .requestMatchers(GET, "/api/v1/app-manager/apps/**").permitAll()
+                .requestMatchers(POST, "/api/v1/app-manager/apps").hasRole(ADMIN.name())
+                .requestMatchers(PUT, "/api/v1/app-manager/apps/**").hasRole(ADMIN.name())
 
                 // /api/v1/user end point all
                 .requestMatchers("api/v1/user/**").hasAnyRole(ADMIN.name(), SENIORMASTER.name(), MASTER.name(),AGENT.name(),USER.name(), AFFILIATEAGENT.name())

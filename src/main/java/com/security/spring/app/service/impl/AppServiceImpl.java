@@ -36,9 +36,9 @@ public class AppServiceImpl implements AppService {
         if (appVersionRepository.findByAppKey(effectiveKey).isPresent()) {
             throw new IllegalArgumentException("App already exists for key: " + effectiveKey + ". Use update endpoint.");
         }
-        String apkFileName = resolveApkFileName(apkFile, effectiveKey);
+        String apkRelativePath;
         try {
-            storageService.saveApk(apkFile, apkFileName);
+            apkRelativePath = storageService.uploadAppFile(apkFile, effectiveKey);
         } catch (IOException e) {
             throw new IllegalStateException("Failed to save APK file", e);
         }
@@ -48,7 +48,7 @@ public class AppServiceImpl implements AppService {
                 .appKey(effectiveKey)
                 .versionName(versionName != null ? versionName : "1.0.0")
                 .versionCode(versionCode != null ? versionCode : 1)
-                .apkFileName(apkFileName)
+                .apkFileName(apkRelativePath)
                 .releaseNotes(releaseNotes)
                 .createdAt(now)
                 .updatedAt(now)
@@ -65,20 +65,24 @@ public class AppServiceImpl implements AppService {
         AppVersion existing = appVersionRepository.findByAppKey(effectiveKey)
                 .orElseThrow(() -> new IllegalArgumentException("App not found for key: " + effectiveKey));
 
-        String oldFileName = existing.getApkFileName();
-        String newApkFileName = resolveApkFileName(apkFile, effectiveKey);
+        String oldRelativePath = existing.getApkFileName();
+        String newRelativePath;
         try {
-            storageService.saveApk(apkFile, newApkFileName);
+            newRelativePath = storageService.uploadAppFile(apkFile, effectiveKey);
         } catch (IOException e) {
             throw new IllegalStateException("Failed to save APK file", e);
         }
-        if (!oldFileName.equals(newApkFileName)) {
-            storageService.deleteFile(oldFileName);
+        if (!oldRelativePath.equals(newRelativePath)) {
+            try {
+                storageService.deleteFileByRelativePath(oldRelativePath);
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to delete old APK file", e);
+            }
         }
 
         existing.setVersionName(versionName != null ? versionName : existing.getVersionName());
         existing.setVersionCode(versionCode != null ? versionCode : existing.getVersionCode());
-        existing.setApkFileName(newApkFileName);
+        existing.setApkFileName(newRelativePath);
         existing.setReleaseNotes(releaseNotes != null ? releaseNotes : existing.getReleaseNotes());
         existing.setUpdatedAt(LocalDateTime.now());
         appVersionRepository.save(existing);
@@ -101,14 +105,6 @@ public class AppServiceImpl implements AppService {
         if (name == null || !name.toLowerCase().endsWith(APK_EXT)) {
             throw new IllegalArgumentException("File must be an APK");
         }
-    }
-
-    private String resolveApkFileName(MultipartFile apkFile, String appKey) {
-        String original = apkFile.getOriginalFilename();
-        if (original != null && original.toLowerCase().endsWith(APK_EXT)) {
-            return original;
-        }
-        return appKey + APK_EXT;
     }
 
     private AppVersionResponse toResponse(AppVersion v) {

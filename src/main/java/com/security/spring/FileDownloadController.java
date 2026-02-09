@@ -21,18 +21,17 @@ public class FileDownloadController {
     private String uploadDir;
 
     /**
-     * Download APK by filename (path variable).
-     * Example: GET /download/apk/ar7.apk
+     * Download APK by relative path (e.g. ar7.apk or apps/ar7/ar7.apk).
+     * Example: GET /download/apk/apps/ar7/ar7.apk
      */
-    @GetMapping("/download/apk/{apkName}")
-    public ResponseEntity<InputStreamResource> downloadApk(@PathVariable String apkName) {
+    @GetMapping("/download/apk/{apkPath:.+}")
+    public ResponseEntity<InputStreamResource> downloadApk(@PathVariable String apkPath) {
         try {
-            // Prevent path traversal: allow only simple filenames (no slashes)
-            if (apkName == null || apkName.contains("/") || apkName.contains("..")) {
+            if (apkPath == null || apkPath.contains("..")) {
                 return ResponseEntity.badRequest().build();
             }
             Path basePath = Paths.get(uploadDir).normalize();
-            Path filePath = basePath.resolve(apkName).normalize();
+            Path filePath = basePath.resolve(apkPath).normalize();
             if (!filePath.startsWith(basePath)) {
                 return ResponseEntity.badRequest().build();
             }
@@ -40,8 +39,9 @@ public class FileDownloadController {
             if (!file.exists() || !file.isFile()) {
                 return ResponseEntity.notFound().build();
             }
+            String filename = file.getName();
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + apkName + "\"");
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"");
             headers.add(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
 
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));

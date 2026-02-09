@@ -120,6 +120,7 @@ public class ObjectMapper {
                 .text(ads.getText()==null?null:ads.getText())
                 .imageUrl(ads.getImageName()==null?null:storageService.getImageByName(ads.getImageName()))
                 .type(ads.getAdsType())
+                .viewType(ads.getViewType())
                 .build();
     }
 }

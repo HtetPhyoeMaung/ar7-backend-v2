@@ -23,11 +23,13 @@ public class AdsDashBoardController {
     public ResponseEntity<CustomResponse<AdsResponse>> createAds(
             @RequestParam(name = "text", required = false) String text,
             @RequestParam(name = "type") Ads.AdsType type,
+            @RequestParam(name = "viewType") Ads.ViewType viewType,
             @RequestParam(name = "image", required = false) MultipartFile image
     ) throws IOException {
         AdsRequest adsRequest = AdsRequest.builder()
                 .text(text)
                 .type(type)
+                .viewType(viewType)
                 .image(image)
                 .build();
         return adsService.createAds(adsRequest);
@@ -38,12 +40,14 @@ public class AdsDashBoardController {
             @PathVariable(name = "id") Long id,
             @RequestParam(name = "text", required = false) String text,
             @RequestParam(name = "type") Ads.AdsType type,
+            @RequestParam(name = "viewType") Ads.ViewType viewType,
             @RequestParam(name = "image", required = false) MultipartFile image
     ) throws IOException {
         AdsRequest adsRequest = AdsRequest.builder()
                 .id(id)
                 .text(text)
                 .type(type)
+                .viewType(viewType)
                 .image(image)
                 .build();
         return adsService.updateAds(adsRequest);

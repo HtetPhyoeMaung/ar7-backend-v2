@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AdsRepository extends JpaRepository<Ads,Long> {
-    List<Ads> findByAdsType(Ads.AdsType type, Sort id);
+public interface AdsRepository extends JpaRepository<Ads, Long> {
+    List<Ads> findByAdsTypeAndViewType(Ads.AdsType type, Ads.ViewType viewType, Sort sort);
 }

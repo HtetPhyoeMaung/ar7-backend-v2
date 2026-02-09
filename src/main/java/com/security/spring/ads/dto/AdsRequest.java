@@ -16,4 +16,5 @@ public class AdsRequest {
     private String text;
     private MultipartFile image;
     private Ads.AdsType type;
+    private Ads.ViewType viewType;
 }

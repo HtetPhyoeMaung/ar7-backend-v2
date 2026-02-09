@@ -18,5 +18,5 @@ public class AdsResponse {
     private String text;
     private String imageUrl;
     private Ads.AdsType type;
-
+    private Ads.ViewType viewType;
 }

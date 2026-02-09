@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @Table(indexes = {
-        @Index(name = "idx_ads_type", columnList = "adsType")
+        @Index(name = "idx_ads_type", columnList = "adsType"),
+        @Index(name = "idx_ads_view_type", columnList = "viewType")
 })
 public class Ads {
     @Id
@@ -20,13 +21,18 @@ public class Ads {
     private Long id;
     @Enumerated(EnumType.STRING)
     private AdsType adsType;
+    @Enumerated(EnumType.STRING)
+    private ViewType viewType;
     private String imageName;
     private String text;
 
-    public enum AdsType{
+    public enum AdsType {
         Carousal,
         RunningText
-
     }
 
+    public enum ViewType {
+        Mobile,
+        Web
+    }
 }

@@ -39,6 +39,7 @@ public class AdsServiceImpl implements AdsService {
                 ads.setText(adsRequest.getText());
         }
         ads.setAdsType(adsRequest.getType());
+        ads.setViewType(adsRequest.getViewType());
         ads = adsRepository.save(ads);
 
         CustomResponse<AdsResponse> response = new CustomResponse<>();
@@ -86,8 +87,8 @@ public class AdsServiceImpl implements AdsService {
     }
 
     @Override
-    public ResponseEntity<CustomResponse<AdsResponse>> getListAds(Ads.AdsType type) {
-        List<Ads> adsList = adsRepository.findByAdsType(type,Sort.by(Sort.Direction.DESC,"id"));
+    public ResponseEntity<CustomResponse<AdsResponse>> getListAds(Ads.AdsType type, Ads.ViewType viewType) {
+        List<Ads> adsList = adsRepository.findByAdsTypeAndViewType(type, viewType, Sort.by(Sort.Direction.DESC, "id"));
         CustomResponse<AdsResponse> response = new CustomResponse<>();
         response.setStatus(true);
         response.setMessage(Constraint.RETRIEVE_SUCCESS_MESSAGE);

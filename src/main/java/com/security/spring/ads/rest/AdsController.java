@@ -18,8 +18,9 @@ public class AdsController {
     private final AdsService adsService;
     @GetMapping
     public ResponseEntity<CustomResponse<AdsResponse>> getListAds(
-            @RequestParam(name = "type")Ads.AdsType type
-            ){
-        return adsService.getListAds(type);
+            @RequestParam(name = "type") Ads.AdsType type,
+            @RequestParam(name = "viewType", defaultValue = "Mobile") Ads.ViewType viewType
+    ) {
+        return adsService.getListAds(type, viewType);
     }
 }

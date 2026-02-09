@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
-@Entity
+@Entity(name = "AppManagerVersion")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

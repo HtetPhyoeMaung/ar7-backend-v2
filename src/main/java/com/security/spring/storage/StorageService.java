@@ -116,4 +116,28 @@ public class StorageService {
             throw new RuntimeException("Failed to delete image: " + imageName, e);
         }
     }
+
+    /**
+     * Saves an APK (or any binary) file with the given filename.
+     * @return the filename as stored
+     */
+    public String saveApk(MultipartFile file, String fileName) throws IOException {
+        Path uploadPath = ensureUploadDirectory();
+        Path filePath = uploadPath.resolve(fileName);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        return fileName;
+    }
+
+    public boolean deleteFile(String fileName) {
+        try {
+            Path filePath = Paths.get(uploadDir, fileName);
+            if (Files.exists(filePath) && Files.isRegularFile(filePath)) {
+                Files.delete(filePath);
+                return true;
+            }
+            return false;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to delete file: " + fileName, e);
+        }
+    }
 }

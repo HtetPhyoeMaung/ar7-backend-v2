@@ -1,8 +1,10 @@
 package com.security.spring.thirdpartygames.gameprovider.rest;
 
 import com.security.spring.thirdpartygames.gameprovider.dto.GameProviderResponse;
+import com.security.spring.thirdpartygames.gameprovider.dto.SortGameProviderRequest;
 import com.security.spring.thirdpartygames.gameprovider.service.GameSoftGameProviderService;
 import com.security.spring.rro.GameSoftProviderRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -83,6 +85,15 @@ public class GameSoftGameProductController {
     @PostMapping("/gameprovider/sync")
     public ResponseEntity<GameProviderResponse> syncProviders() {
         GameProviderResponse response = gameSoftGameProviderService.syncProviders();
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/gameprovider/sort")
+    public ResponseEntity<GameProviderResponse> sortGameProviders(
+            @RequestBody(required = false) @Valid SortGameProviderRequest request) {
+        GameProviderResponse response = (request != null && request.getProviders() != null && !request.getProviders().isEmpty())
+                ? gameSoftGameProviderService.sortGameProviders(request)
+                : gameSoftGameProviderService.sortGameProvidersWithDefaults();
         return ResponseEntity.ok(response);
     }
 }

@@ -34,6 +34,9 @@ public class GameSoftGameProvider {
     @ToString.Exclude
     private GameType gameType;
 
+    @Column(name = "sort_number")
+    private Integer sortNumber;
+
     private boolean deleted;
 
     @OneToMany(mappedBy = "productID", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})

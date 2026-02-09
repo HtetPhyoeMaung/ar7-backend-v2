@@ -5,6 +5,8 @@ import com.security.spring.thirdpartygames.gameType.entity.GameType;
 import com.security.spring.thirdpartygames.gameType.repo.GameTypeRepo;
 import com.security.spring.thirdpartygames.gameprovider.dto.GameProviderObj;
 import com.security.spring.thirdpartygames.gameprovider.dto.GameProviderResponse;
+import com.security.spring.thirdpartygames.gameprovider.dto.ProviderSortItem;
+import com.security.spring.thirdpartygames.gameprovider.dto.SortGameProviderRequest;
 import com.security.spring.thirdpartygames.gameprovider.entity.GameSoftGameProvider;
 import com.security.spring.thirdpartygames.gameprovider.repository.GameProviderRepo;
 import com.security.spring.thirdpartygames.getProviderList.dto.ProviderDataFeign;
@@ -28,7 +30,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -75,10 +80,14 @@ public class GameSoftProviderServiceImpl implements GameSoftGameProviderService 
     @Override
     @Transactional
     public GameProviderResponse getAllGameProvider() {
-        List<GameSoftGameProvider> gameProviderList = gameProviderRepo.findAll();
+        List<GameSoftGameProvider> gameProviderList = gameProviderRepo.findAll()
+                .stream()
+                .filter(gp -> !gp.isDeleted())
+                .sorted(Comparator.comparing(GameSoftGameProvider::getSortNumber, Comparator.nullsLast(Comparator.naturalOrder()))
+                        .thenComparing(GameSoftGameProvider::getId))
+                .toList();
         List<GameProviderObj> gameProviderObjList = gameProviderList
                 .stream()
-                .filter(gameSoftGameProvider -> !gameSoftGameProvider.isDeleted())
                 .map(
                         obj -> GameProviderObj
                                 .builder()
@@ -91,6 +100,7 @@ public class GameSoftProviderServiceImpl implements GameSoftGameProviderService 
                                 .gameTypeName(obj.getGameType().getDescription())
                                 .currencyCode(obj.getCurrencyCode())
                                 .conversionRate(obj.getConversionRate())
+                                .sortNumber(obj.getSortNumber())
                                 .build()
                 )
                 .toList();
@@ -123,9 +133,10 @@ public class GameSoftProviderServiceImpl implements GameSoftGameProviderService 
                         .imageUrl(obj.getImageName()==null?null:storageService
                                 .getImageByName(obj.getImageName()))
                         .gameTypeName(obj.getGameType().getDescription())
-                        .currencyCode(obj.getCurrencyCode())
-                        .conversionRate(obj.getConversionRate())
-                        .build())
+                                .currencyCode(obj.getCurrencyCode())
+                                .conversionRate(obj.getConversionRate())
+                                .sortNumber(obj.getSortNumber())
+                                .build())
                 .toList();
 
         return GameProviderResponse
@@ -187,14 +198,15 @@ public class GameSoftProviderServiceImpl implements GameSoftGameProviderService 
             throw new DataNotFoundException("Game Type Id Wrong");
         }
         GameType gameTypeGet = gameType.get();
-        List<GameSoftGameProvider> gameProviderList;
-
-        gameProviderList = gameProviderRepo.findByGameType(gameTypeGet);
-
+        List<GameSoftGameProvider> gameProviderList = gameProviderRepo.findByGameType(gameTypeGet)
+                .stream()
+                .filter(gp -> !gp.isDeleted())
+                .sorted(Comparator.comparing(GameSoftGameProvider::getSortNumber, Comparator.nullsLast(Comparator.naturalOrder()))
+                        .thenComparing(GameSoftGameProvider::getId))
+                .toList();
 
         List<GameProviderObj> gameProviderObjList = gameProviderList
                 .stream()
-                .filter(gameSoftGameProvider -> !gameSoftGameProvider.isDeleted())
                 .map(
                         obj -> GameProviderObj
                                 .builder()
@@ -208,6 +220,7 @@ public class GameSoftProviderServiceImpl implements GameSoftGameProviderService 
                                 .gameTypeCode(obj.getGameType().getCode())
                                 .currencyCode(obj.getCurrencyCode())
                                 .conversionRate(obj.getConversionRate())
+                                .sortNumber(obj.getSortNumber())
                                 .build()
                 )
                 .collect(Collectors.toList());
@@ -343,15 +356,95 @@ public class GameSoftProviderServiceImpl implements GameSoftGameProviderService 
                         .message("Failed to fetch providers from API")
                         .build();
             }
-        } catch (Exception e) {
-            log.error("Error syncing providers", e);
-            return GameProviderResponse
-                    .builder()
+        } catch (Exception ex) {
+            log.error("Error syncing providers", ex);
+            String errorMsg = "Error syncing providers: " + ex.getMessage();
+            return GameProviderResponse.builder()
                     .status(false)
                     .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                    .message("Error syncing providers: " + e.getMessage())
+                    .message(errorMsg)
                     .build();
         }
+    }
+
+    @Override
+    @Transactional
+    public GameProviderResponse sortGameProviders(SortGameProviderRequest request) {
+        GameType gameType = gameTypeRepo.findByCode(request.getGameTypeCode())
+                .orElseThrow(() -> new DataNotFoundException("Game type not found: " + request.getGameTypeCode()));
+
+        int updatedCount = 0;
+        for (ProviderSortItem item : request.getProviders()) {
+            if (item.getProduct() == null || item.getSortNumber() == null) {
+                continue;
+            }
+            Optional<GameSoftGameProvider> providerOpt = gameProviderRepo.findByProductAndGameType(item.getProduct(), gameType);
+            if (providerOpt.isPresent()) {
+                GameSoftGameProvider provider = providerOpt.get();
+                provider.setSortNumber(item.getSortNumber());
+                gameProviderRepo.save(provider);
+                updatedCount++;
+            } else {
+                log.warn("Provider not found for product {} in game type {}", item.getProduct(), request.getGameTypeCode());
+            }
+        }
+
+        String message = String.format("Sort order updated for %d providers in game type %s", updatedCount, request.getGameTypeCode());
+        return GameProviderResponse
+                .builder()
+                .status(true)
+                .statusCode(HttpStatus.OK.value())
+                .message(message)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public GameProviderResponse sortGameProvidersWithDefaults() {
+        Map<String, List<ProviderSortItem>> defaultOrder = getDefaultSortOrderMap();
+        int totalUpdated = 0;
+        for (Map.Entry<String, List<ProviderSortItem>> entry : defaultOrder.entrySet()) {
+            String gameTypeCode = entry.getKey();
+            Optional<GameType> gameTypeOpt = gameTypeRepo.findByCode(gameTypeCode);
+            if (gameTypeOpt.isEmpty()) {
+                log.debug("Game type not found, skipping: {}", gameTypeCode);
+                continue;
+            }
+            GameType gameType = gameTypeOpt.get();
+            for (ProviderSortItem sortItem : entry.getValue()) {
+                if (sortItem.getProduct() == null || sortItem.getSortNumber() == null) continue;
+                Optional<GameSoftGameProvider> providerOpt = gameProviderRepo.findByProductAndGameType(sortItem.getProduct(), gameType);
+                if (providerOpt.isPresent()) {
+                    GameSoftGameProvider provider = providerOpt.get();
+                    provider.setSortNumber(sortItem.getSortNumber());
+                    gameProviderRepo.save(provider);
+                    totalUpdated++;
+                }
+            }
+        }
+        String message = String.format("Default sort order applied. Updated %d providers.", totalUpdated);
+        return GameProviderResponse
+                .builder()
+                .status(true)
+                .statusCode(HttpStatus.OK.value())
+                .message(message)
+                .build();
+    }
+
+    private static Map<String, List<ProviderSortItem>> getDefaultSortOrderMap() {
+        Map<String, List<ProviderSortItem>> map = new HashMap<>();
+        map.put("SLOT", List.of(
+                new ProviderSortItem(1006L, 1), new ProviderSortItem(1018L, 2), new ProviderSortItem(1079L, 3), new ProviderSortItem(1091L, 4),
+                new ProviderSortItem(1085L, 5), new ProviderSortItem(1009L, 6), new ProviderSortItem(1204L, 7), new ProviderSortItem(2026L, 8)));
+        map.put("FISHING", List.of(
+                new ProviderSortItem(1091L, 1), new ProviderSortItem(1009L, 2), new ProviderSortItem(1085L, 3), new ProviderSortItem(1079L, 4), new ProviderSortItem(1225L, 5)));
+        map.put("18", List.of(new ProviderSortItem(2026L, 1)));
+        map.put("LIVE_CASINO", List.of(
+                new ProviderSortItem(1022L, 1), new ProviderSortItem(1006L, 2), new ProviderSortItem(1091L, 3), new ProviderSortItem(1149L, 4)));
+        map.put("SHAN_BUGYI", List.of(new ProviderSortItem(2026L, 1)));
+        map.put("SPORT_BOOK", List.of(new ProviderSortItem(1012L, 1), new ProviderSortItem(1222L, 2)));
+        map.put("ESPORT", List.of(new ProviderSortItem(1222L, 1)));
+        return map;
     }
 
 }

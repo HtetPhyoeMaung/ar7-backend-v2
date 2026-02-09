@@ -2,6 +2,7 @@ package com.security.spring.thirdpartygames.gameprovider.service;
 
 import com.security.spring.thirdpartygames.gameType.entity.GameType;
 import com.security.spring.thirdpartygames.gameprovider.dto.GameProviderResponse;
+import com.security.spring.thirdpartygames.gameprovider.dto.SortGameProviderRequest;
 import com.security.spring.thirdpartygames.gameprovider.entity.GameSoftGameProvider;
 import com.security.spring.rro.GameSoftProviderRequest;
 
@@ -18,4 +19,8 @@ public interface GameSoftGameProviderService {
      GameProviderResponse deleteProviderById(int providerId);
 
      GameProviderResponse syncProviders();
+
+     GameProviderResponse sortGameProviders(SortGameProviderRequest request);
+
+     GameProviderResponse sortGameProvidersWithDefaults();
 }

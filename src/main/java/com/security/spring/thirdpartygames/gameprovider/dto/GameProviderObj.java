@@ -19,4 +19,5 @@ public class GameProviderObj {
     private Double conversionRate;
     private String imageUrl;
     private String gameTypeCode;
+    private Integer sortNumber;
 }

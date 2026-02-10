@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 @Builder
-@Table(name = "app_version", indexes = {
+@Table(name = "app_version_by_key", indexes = {
         @Index(name = "idx_app_version_key", columnList = "appKey")
 })
 public class AppVersion {

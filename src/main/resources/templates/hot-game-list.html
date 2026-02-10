@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Provider Games List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            margin-bottom: 20px;
+            color: #343a40;
+        }
+        .table img {
+            max-width: 50px;
+            height: auto;
+            border-radius: 5px;
+        }
+        .category-badge {
+            font-size: 0.85em;
+        }
+        #searchInput {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Provider & GameBank Games</h2>
+            <span class="text-muted" th:text="${isLive ? 'Showing ALL available games from providers (Live)' : 'Showing Managed Hot Games (Database)'}">Status</span>
+        </div>
+        <div>
+            <a th:if="${!isLive}" href="/games-list?all=true" class="btn btn-warning">Fetch All Live Games</a>
+            <a th:if="${isLive}" href="/games-list" class="btn btn-secondary">Show Managed Only</a>
+            <span class="badge bg-primary ms-2" th:text="${games.size() + ' Games Found'}">0 Games Found</span>
+        </div>
+    </div>
+
+    <input type="text" id="searchInput" class="form-control" placeholder="Search by game name, code or category...">
+
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Image</th>
+                    <th>Game Name</th>
+                    <th>Game Code</th>
+                    <th>Category</th>
+                    <th>Product Code</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Sort</th>
+                </tr>
+            </thead>
+            <tbody id="gameTableBody">
+                <tr th:each="game : ${games}">
+                    <td th:text="${game.id}">1</td>
+                    <td>
+                        <img th:if="${game.imageUrl}" th:src="${game.imageUrl}" alt="Game Image">
+                        <span th:unless="${game.imageUrl}">No Image</span>
+                    </td>
+                    <td th:text="${game.gameName}">Game Name</td>
+                    <td th:text="${game.gameCode}">Code</td>
+                    <td>
+                        <span class="badge bg-info text-dark category-badge" th:text="${game.category}">Category</span>
+                    </td>
+                    <td th:text="${game.productCode}">0</td>
+                    <td th:text="${game.gameType}">Type</td>
+                    <td>
+                        <span th:classappend="${game.status == '1' || game.status == 'active' ? 'text-success' : 'text-danger'}" 
+                              th:text="${game.status}">Status</span>
+                    </td>
+                    <td th:text="${game.sortOrder}">0</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#gameTableBody tr');
+
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
+</script>
+</body>
+</html>

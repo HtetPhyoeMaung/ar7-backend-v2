@@ -54,4 +54,11 @@ public class AppController {
     public ResponseEntity<List<AppVersionResponse>> getApkList() {
         return ResponseEntity.ok(appService.getApkList());
     }
+
+    @GetMapping("/{appKey}")
+    @Operation(summary = "Get app detail by app key", description = "Get full app version details for the given app key")
+    public ResponseEntity<AppVersionResponse> getDetailByAppKey(@PathVariable String appKey) {
+        AppVersionResponse response = appService.checkVersion(appKey);
+        return ResponseEntity.ok(response);
+    }
 }

@@ -47,6 +47,7 @@ public class AppServiceImpl implements AppService {
         AppVersion version = AppVersion.builder()
                 .appKey(effectiveKey)
                 .versionName(versionName != null ? versionName : "1.0.0")
+                .versionCode(1)
                 .apkFileName(apkRelativePath)
                 .createdAt(now)
                 .updatedAt(now)

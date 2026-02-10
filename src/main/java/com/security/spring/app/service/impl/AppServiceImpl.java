@@ -7,11 +7,13 @@ import com.security.spring.app.service.AppService;
 import com.security.spring.storage.StorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -29,9 +31,11 @@ public class AppServiceImpl implements AppService {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
+    @Value("${file.cdn.domain}")
+    private String cdnDomain;
+
     @Override
-    public AppVersionResponse uploadApp(String appKey, String versionName, Integer versionCode,
-                                        String releaseNotes, MultipartFile apkFile) {
+    public AppVersionResponse uploadApp(String appKey, String versionName, MultipartFile apkFile) {
         validateApkFile(apkFile);
         String effectiveKey = Optional.ofNullable(appKey).filter(s -> !s.isBlank()).orElse(DEFAULT_APP_KEY);
         if (appVersionRepository.findByAppKey(effectiveKey).isPresent()) {
@@ -48,9 +52,8 @@ public class AppServiceImpl implements AppService {
         AppVersion version = AppVersion.builder()
                 .appKey(effectiveKey)
                 .versionName(versionName != null ? versionName : "1.0.0")
-                .versionCode(versionCode != null ? versionCode : 1)
+                .versionCode(1)
                 .apkFileName(apkRelativePath)
-                .releaseNotes(releaseNotes)
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
@@ -59,32 +62,31 @@ public class AppServiceImpl implements AppService {
     }
 
     @Override
-    public AppVersionResponse updateApp(String appKey, String versionName, Integer versionCode,
-                                        String releaseNotes, MultipartFile apkFile) {
-        validateApkFile(apkFile);
+    public AppVersionResponse updateApp(String appKey, String versionName, MultipartFile apkFile) {
         String effectiveKey = Optional.ofNullable(appKey).filter(s -> !s.isBlank()).orElse(DEFAULT_APP_KEY);
         AppVersion existing = appVersionRepository.findByAppKey(effectiveKey)
                 .orElseThrow(() -> new IllegalArgumentException("App not found for key: " + effectiveKey));
 
-        String oldRelativePath = existing.getApkFileName();
-        String newRelativePath;
-        try {
-            newRelativePath = storageService.uploadAppFile(apkFile, effectiveKey);
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to save APK file", e);
-        }
-        if (!oldRelativePath.equals(newRelativePath)) {
+        if (apkFile != null && !apkFile.isEmpty()) {
+            validateApkFile(apkFile);
+            String oldRelativePath = existing.getApkFileName();
+            String newRelativePath;
             try {
-                storageService.deleteFileByRelativePath(oldRelativePath);
+                newRelativePath = storageService.uploadAppFile(apkFile, effectiveKey);
             } catch (IOException e) {
-                throw new IllegalStateException("Failed to delete old APK file", e);
+                throw new IllegalStateException("Failed to save APK file", e);
             }
+            if (!oldRelativePath.equals(newRelativePath)) {
+                try {
+                    storageService.deleteFileByRelativePath(oldRelativePath);
+                } catch (IOException e) {
+                    throw new IllegalStateException("Failed to delete old APK file", e);
+                }
+            }
+            existing.setApkFileName(newRelativePath);
         }
 
-        existing.setVersionName(versionName != null ? versionName : existing.getVersionName());
-        existing.setVersionCode(versionCode != null ? versionCode : existing.getVersionCode());
-        existing.setApkFileName(newRelativePath);
-        existing.setReleaseNotes(releaseNotes != null ? releaseNotes : existing.getReleaseNotes());
+        existing.setVersionName(versionName != null && !versionName.isBlank() ? versionName : existing.getVersionName());
         existing.setUpdatedAt(LocalDateTime.now());
         appVersionRepository.save(existing);
         return toResponse(existing);
@@ -105,6 +107,20 @@ public class AppServiceImpl implements AppService {
                 .toList();
     }
 
+    @Override
+    public void deleteByAppKey(String appKey) {
+        String effectiveKey = Optional.ofNullable(appKey).filter(s -> !s.isBlank()).orElse(DEFAULT_APP_KEY);
+        AppVersion existing = appVersionRepository.findByAppKey(effectiveKey)
+                .orElseThrow(() -> new IllegalArgumentException("App not found for key: " + effectiveKey));
+        String apkRelativePath = existing.getApkFileName();
+        try {
+            storageService.deleteFileByRelativePath(apkRelativePath);
+        } catch (IOException e) {
+            // best effort: delete DB record even if file is missing or delete fails
+        }
+        appVersionRepository.delete(existing);
+    }
+
     private void validateApkFile(MultipartFile apkFile) {
         if (apkFile == null || apkFile.isEmpty()) {
             throw new IllegalArgumentException("APK file is required");
@@ -115,9 +131,20 @@ public class AppServiceImpl implements AppService {
         }
     }
 
+    @Override
+    public Resource getDownloadResource(String appKey) throws IOException {
+        String effectiveKey = Optional.ofNullable(appKey).filter(s -> !s.isBlank()).orElse(DEFAULT_APP_KEY);
+        AppVersion version = appVersionRepository.findByAppKey(effectiveKey)
+                .orElseThrow(() -> new IllegalArgumentException("App not found for key: " + effectiveKey));
+        Path filePath = storageService.getAppFilePath(version.getApkFileName());
+        if (!java.nio.file.Files.exists(filePath) || !java.nio.file.Files.isRegularFile(filePath)) {
+            throw new IOException("APK file not found: " + version.getApkFileName());
+        }
+        return new FileSystemResource(filePath.toFile());
+    }
+
     private AppVersionResponse toResponse(AppVersion v) {
-        String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-        String downloadUrl = baseUrl + "/download/apk/" + v.getApkFileName();
+        String downloadUrl = cdnDomain + "/api/v1/app/download/" + v.getAppKey();
         return AppVersionResponse.builder()
                 .appKey(v.getAppKey())
                 .versionName(v.getVersionName())

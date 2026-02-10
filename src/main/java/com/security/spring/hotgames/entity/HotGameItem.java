@@ -60,4 +60,19 @@ public class HotGameItem {
 
     @Column(name = "sort_order")
     private Integer sortOrder;
+
+    @Column(name = "item_type")
+    private String itemType; // "GAME" or "PROVIDER"
+
+    @Column(name = "provider_sort_order")
+    private Integer providerSortOrder;
+
+    @Column(name = "game_type_id")
+    private Integer gameTypeId;
+
+    @Column(name = "game_type_name")
+    private String gameTypeName;
+
+    @Column(name = "conversion_rate")
+    private Double conversionRate;
 }

@@ -63,28 +63,30 @@ public class AppServiceImpl implements AppService {
 
     @Override
     public AppVersionResponse updateApp(String appKey, String versionName, MultipartFile apkFile) {
-        validateApkFile(apkFile);
         String effectiveKey = Optional.ofNullable(appKey).filter(s -> !s.isBlank()).orElse(DEFAULT_APP_KEY);
         AppVersion existing = appVersionRepository.findByAppKey(effectiveKey)
                 .orElseThrow(() -> new IllegalArgumentException("App not found for key: " + effectiveKey));
 
-        String oldRelativePath = existing.getApkFileName();
-        String newRelativePath;
-        try {
-            newRelativePath = storageService.uploadAppFile(apkFile, effectiveKey);
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to save APK file", e);
-        }
-        if (!oldRelativePath.equals(newRelativePath)) {
+        if (apkFile != null && !apkFile.isEmpty()) {
+            validateApkFile(apkFile);
+            String oldRelativePath = existing.getApkFileName();
+            String newRelativePath;
             try {
-                storageService.deleteFileByRelativePath(oldRelativePath);
+                newRelativePath = storageService.uploadAppFile(apkFile, effectiveKey);
             } catch (IOException e) {
-                throw new IllegalStateException("Failed to delete old APK file", e);
+                throw new IllegalStateException("Failed to save APK file", e);
             }
+            if (!oldRelativePath.equals(newRelativePath)) {
+                try {
+                    storageService.deleteFileByRelativePath(oldRelativePath);
+                } catch (IOException e) {
+                    throw new IllegalStateException("Failed to delete old APK file", e);
+                }
+            }
+            existing.setApkFileName(newRelativePath);
         }
 
-        existing.setVersionName(versionName != null ? versionName : existing.getVersionName());
-        existing.setApkFileName(newRelativePath);
+        existing.setVersionName(versionName != null && !versionName.isBlank() ? versionName : existing.getVersionName());
         existing.setUpdatedAt(LocalDateTime.now());
         appVersionRepository.save(existing);
         return toResponse(existing);

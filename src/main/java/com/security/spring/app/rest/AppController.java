@@ -35,11 +35,11 @@ public class AppController {
     }
 
     @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Update app APK", description = "Update existing app with new APK and version info")
+    @Operation(summary = "Update app APK", description = "Update existing app with new APK and version info. APK is optional; if omitted, existing file is kept.")
     public ResponseEntity<AppVersionResponse> updateApp(
             @RequestParam(value = "appKey", required = false) String appKey,
             @RequestParam(value = "versionName", required = false) String versionName,
-            @RequestParam("apk") MultipartFile apkFile) {
+            @RequestParam(value = "apk", required = false) MultipartFile apkFile) {
         AppVersionResponse response = appService.updateApp(appKey, versionName, apkFile);
         return ResponseEntity.ok(response);
     }

@@ -5,12 +5,15 @@ import com.security.spring.app.service.AppService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -53,6 +56,21 @@ public class AppController {
     @Operation(summary = "Get APK list", description = "Get list of all registered APKs with download links")
     public ResponseEntity<List<AppVersionResponse>> getApkList() {
         return ResponseEntity.ok(appService.getApkList());
+    }
+
+    @GetMapping("/download/{appKey}")
+    @Operation(summary = "Download APK by app key", description = "Download the APK file for the given app key")
+    public ResponseEntity<Resource> downloadByAppKey(@PathVariable String appKey) throws IOException {
+        Resource resource = appService.getDownloadResource(appKey);
+        String filename = resource.getFilename();
+        if (filename == null) {
+            filename = appKey + ".apk";
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
+                .body(resource);
     }
 
     @GetMapping("/{appKey}")

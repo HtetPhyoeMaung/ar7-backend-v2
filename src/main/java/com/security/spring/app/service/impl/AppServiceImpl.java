@@ -7,11 +7,13 @@ import com.security.spring.app.service.AppService;
 import com.security.spring.storage.StorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +30,9 @@ public class AppServiceImpl implements AppService {
 
     @Value("${file.upload-dir}")
     private String uploadDir;
+
+    @Value("${file.cdn.domain}")
+    private String cdnDomain;
 
     @Override
     public AppVersionResponse uploadApp(String appKey, String versionName, MultipartFile apkFile) {
@@ -124,9 +129,20 @@ public class AppServiceImpl implements AppService {
         }
     }
 
+    @Override
+    public Resource getDownloadResource(String appKey) throws IOException {
+        String effectiveKey = Optional.ofNullable(appKey).filter(s -> !s.isBlank()).orElse(DEFAULT_APP_KEY);
+        AppVersion version = appVersionRepository.findByAppKey(effectiveKey)
+                .orElseThrow(() -> new IllegalArgumentException("App not found for key: " + effectiveKey));
+        Path filePath = storageService.getAppFilePath(version.getApkFileName());
+        if (!java.nio.file.Files.exists(filePath) || !java.nio.file.Files.isRegularFile(filePath)) {
+            throw new IOException("APK file not found: " + version.getApkFileName());
+        }
+        return new FileSystemResource(filePath.toFile());
+    }
+
     private AppVersionResponse toResponse(AppVersion v) {
-        String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-        String downloadUrl = baseUrl + "/download/apk/" + v.getApkFileName();
+        String downloadUrl = cdnDomain + "/api/v1/app/download/" + v.getAppKey();
         return AppVersionResponse.builder()
                 .appKey(v.getAppKey())
                 .versionName(v.getVersionName())

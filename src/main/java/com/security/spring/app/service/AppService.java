@@ -1,8 +1,10 @@
 package com.security.spring.app.service;
 
 import com.security.spring.app.dto.AppVersionResponse;
+import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface AppService {
@@ -16,4 +18,6 @@ public interface AppService {
     List<AppVersionResponse> getApkList();
 
     void deleteByAppKey(String appKey);
+
+    Resource getDownloadResource(String appKey) throws IOException;
 }

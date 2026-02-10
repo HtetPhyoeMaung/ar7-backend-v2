@@ -75,6 +75,7 @@ public class SecurityConfiguration {
                                 .requestMatchers("api/v1/dashboard/ads/**").hasRole(ADMIN.name())
                                 .requestMatchers("api/v1/ads/**").permitAll()
                 .requestMatchers(GET, "/api/v1/app-manager/apps/**").permitAll()
+                .requestMatchers(GET, "/api/v1/app/version").permitAll()
                 .requestMatchers(POST, "/api/v1/app-manager/apps").hasRole(ADMIN.name())
                 .requestMatchers(PUT, "/api/v1/app-manager/apps/**").hasRole(ADMIN.name())
 

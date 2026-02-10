@@ -61,4 +61,11 @@ public class AppController {
         AppVersionResponse response = appService.checkVersion(appKey);
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{appKey}")
+    @Operation(summary = "Delete app by app key", description = "Delete the app and its APK file for the given app key")
+    public ResponseEntity<Void> deleteByAppKey(@PathVariable String appKey) {
+        appService.deleteByAppKey(appKey);
+        return ResponseEntity.noContent().build();
+    }
 }

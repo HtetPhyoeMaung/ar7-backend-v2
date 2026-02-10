@@ -14,4 +14,6 @@ public interface AppService {
     AppVersionResponse checkVersion(String appKey);
 
     List<AppVersionResponse> getApkList();
+
+    void deleteByAppKey(String appKey);
 }

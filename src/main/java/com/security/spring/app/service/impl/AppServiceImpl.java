@@ -100,6 +100,20 @@ public class AppServiceImpl implements AppService {
                 .toList();
     }
 
+    @Override
+    public void deleteByAppKey(String appKey) {
+        String effectiveKey = Optional.ofNullable(appKey).filter(s -> !s.isBlank()).orElse(DEFAULT_APP_KEY);
+        AppVersion existing = appVersionRepository.findByAppKey(effectiveKey)
+                .orElseThrow(() -> new IllegalArgumentException("App not found for key: " + effectiveKey));
+        String apkRelativePath = existing.getApkFileName();
+        try {
+            storageService.deleteFileByRelativePath(apkRelativePath);
+        } catch (IOException e) {
+            // best effort: delete DB record even if file is missing or delete fails
+        }
+        appVersionRepository.delete(existing);
+    }
+
     private void validateApkFile(MultipartFile apkFile) {
         if (apkFile == null || apkFile.isEmpty()) {
             throw new IllegalArgumentException("APK file is required");

@@ -38,8 +38,9 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests((authorize) -> authorize
                 // Permit all access to the following paths
                 .requestMatchers(
+                		"/games-list",
                         "/api/v1/democontroller/**",
-                        "/api/v1/ggl/hot-games",
+                        "/api/v1/ggl/hot-games/**",
                         "/api/v1/user/checkAr7Id/**",
                         "/api/v1/auth/**",
                         "/v2/api-docs",
@@ -60,7 +61,8 @@ public class SecurityConfiguration {
                          "/download/**",
                          "/api/v1/shan/**",
                         "/api/v1/app-manager/apps/*/download",
-                        "/api/v1/app-manager/apps/*/version"
+                        "/api/v1/app-manager/apps/*/version",
+                        "/games-list"
                          ,"/api/v1/game-bank/seamless/**"
 //                        "/api/v1/gt/**",
 //                        "/api/v1/gameproduct/**"

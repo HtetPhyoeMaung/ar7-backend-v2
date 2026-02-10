@@ -37,6 +37,11 @@ public class HotGameController {
     public ResponseEntity<List<HotGameItem>> getHotGamesForDashboard(){
         return ResponseEntity.ok(hotGameService.getHotGameItems());
     }
+
+    @GetMapping("/all-available")
+    public ResponseEntity<List<HotGameItem>> getAllAvailableGames(){
+        return ResponseEntity.ok(hotGameService.fetchAllAvailableGames());
+    }
     
     @PostMapping("/refresh")
     public ResponseEntity<Void> refreshHotGames() {

@@ -15,6 +15,8 @@ import com.security.spring.hotgames.dto.AddHotGameRequest;
 import com.security.spring.hotgames.entity.HotGameItem;
 import com.security.spring.hotgames.repository.HotGameItemRepository;
 import com.security.spring.hotgames.service.HotGameService;
+import com.security.spring.thirdpartygames.gameprovider.entity.GameSoftGameProvider;
+import com.security.spring.thirdpartygames.gameprovider.repository.GameProviderRepo;
 import com.security.spring.thirdpartygames.getGameList.dto.GetGameListRequest;
 import com.security.spring.thirdpartygames.getGameList.dto.GetGameListResponse;
 import com.security.spring.thirdpartygames.getGameList.dto.ProviderGame;
@@ -29,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 public class HotGameServiceImpl implements HotGameService {
     private final HotGameItemRepository hotGameItemRepository;
     private final GetGameListService getGameListService;
+    private final GameProviderRepo gameProviderRepo;
 
     @Override
     public Map<String, List<ProviderGame>> getHotGames() {
@@ -122,6 +125,82 @@ public class HotGameServiceImpl implements HotGameService {
     @Transactional
     public void removeHotGame(Integer id) {
         hotGameItemRepository.deleteById(id);
+    }
+
+    @Override
+    public List<HotGameItem> fetchAllAvailableGames() {
+        List<GameSoftGameProvider> providers = gameProviderRepo.findAll();
+        List<HotGameItem> allGames = new java.util.ArrayList<>();
+
+        for (GameSoftGameProvider provider : providers) {
+            if (provider.getGameType() == null || provider.getProduct() == null) continue;
+            
+            try {
+                GetGameListRequest request = GetGameListRequest.builder()
+                        .productID(provider.getProduct().intValue())
+                        .gameType(provider.getGameType().getCode())
+                        .fromHotGame(true)
+                        .build();
+
+                GetGameListResponse response = getGameListService.getGameListConfigSystem(request);
+                
+                if (response != null && response.getGameListResponse() != null && response.getGameListResponse().getProviderGames() != null) {
+                    List<ProviderGame> freshGames = response.getGameListResponse().getProviderGames();
+                    for (ProviderGame pg : freshGames) {
+                        allGames.add(HotGameItem.builder()
+                                .gameName(pg.getGameName())
+                                .gameCode(pg.getGameCode())
+                                .gameType(pg.getGameType())
+                                .productId(pg.getProductId())
+                                .productCode(pg.getProductCode())
+                                .imageUrl(pg.getImageUrl())
+                                .supportCurrency(pg.getSupportCurrency())
+                                .status(pg.getStatus())
+                                .platform(pg.getPlatform())
+                                .gameUrl(pg.getGameUrl())
+                                .description(pg.getDescription())
+                                .category(provider.getProductCode() + " - " + provider.getGameType().getCode())
+                                .build());
+                    }
+                }
+            } catch (Exception e) {
+                log.error("Failed to fetch games for provider {} type {}", provider.getProduct(), provider.getGameType().getCode(), e);
+            }
+        }
+        
+        // Also fetch from GameBank (product 2026) if not already included
+        if (providers.stream().noneMatch(p -> p.getProduct() != null && p.getProduct() == 2026)) {
+             try {
+                GetGameListRequest gbRequest = GetGameListRequest.builder()
+                        .productID(2026)
+                        .gameType("SLOT") // Default type for GameBank
+                        .fromHotGame(true)
+                        .build();
+                GetGameListResponse gbResponse = getGameListService.getGameListConfigSystem(gbRequest);
+                if (gbResponse != null && gbResponse.getGameListResponse() != null && gbResponse.getGameListResponse().getProviderGames() != null) {
+                    for (ProviderGame pg : gbResponse.getGameListResponse().getProviderGames()) {
+                        allGames.add(HotGameItem.builder()
+                                .gameName(pg.getGameName())
+                                .gameCode(pg.getGameCode())
+                                .gameType(pg.getGameType())
+                                .productId(pg.getProductId())
+                                .productCode(pg.getProductCode())
+                                .imageUrl(pg.getImageUrl())
+                                .supportCurrency(pg.getSupportCurrency())
+                                .status(pg.getStatus())
+                                .platform(pg.getPlatform())
+                                .gameUrl(pg.getGameUrl())
+                                .description(pg.getDescription())
+                                .category("GameBank - SLOT")
+                                .build());
+                    }
+                }
+             } catch (Exception e) {
+                 log.error("Failed to fetch games for GameBank", e);
+             }
+        }
+
+        return allGames;
     }
 
     private void updateItemDetails(HotGameItem item, ProviderGame fresh) {

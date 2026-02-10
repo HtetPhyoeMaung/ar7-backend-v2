@@ -9,6 +9,8 @@ import java.util.Optional;
 @Repository
 public interface GameTypeRepo extends JpaRepository<GameType , Integer> {
     Optional<GameType> findByCode(String  code);
+    
+    Optional<GameType> findByCodeIgnoreCase(String code);
 
     Optional<GameType> findByDescription(String gameType);
 }

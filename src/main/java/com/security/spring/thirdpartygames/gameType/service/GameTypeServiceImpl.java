@@ -126,7 +126,7 @@ public class GameTypeServiceImpl implements GameTypeService{
 
     @Override
     public GameType findByCode(String  gameType) {
-        return gameTypeRepo.findByCode(gameType).orElseThrow(()->
+        return gameTypeRepo.findByCodeIgnoreCase(gameType).orElseThrow(()->
                 new DataNotFoundException("GameType not found by Code : "+gameType));
     }
 

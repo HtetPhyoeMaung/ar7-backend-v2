@@ -57,7 +57,7 @@ public class LunchGameServiceImpl implements LunchGameService {
 
 
 
-            GameType gameType = gameTypeRepo.findByCode(data.getGameType())
+            GameType gameType = gameTypeRepo.findByCodeIgnoreCase(data.getGameType())
                     .orElseThrow(() -> new DataNotFoundException("No Game Type Found"));
             GameSoftGameProvider provider = gameProviderRepo.findByProductAndGameType(Long.valueOf(data.getProductID()), gameType)
                     .orElseThrow(() -> new DataNotFoundException("No Game Provider Found"));

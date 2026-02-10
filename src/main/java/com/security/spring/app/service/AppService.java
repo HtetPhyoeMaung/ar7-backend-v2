@@ -7,11 +7,9 @@ import java.util.List;
 
 public interface AppService {
 
-    AppVersionResponse uploadApp(String appKey, String versionName, Integer versionCode,
-                                 String releaseNotes, MultipartFile apkFile);
+    AppVersionResponse uploadApp(String appKey, String versionName, MultipartFile apkFile);
 
-    AppVersionResponse updateApp(String appKey, String versionName, Integer versionCode,
-                                 String releaseNotes, MultipartFile apkFile);
+    AppVersionResponse updateApp(String appKey, String versionName, MultipartFile apkFile);
 
     AppVersionResponse checkVersion(String appKey);
 

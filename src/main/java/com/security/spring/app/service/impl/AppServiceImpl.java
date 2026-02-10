@@ -30,8 +30,7 @@ public class AppServiceImpl implements AppService {
     private String uploadDir;
 
     @Override
-    public AppVersionResponse uploadApp(String appKey, String versionName, Integer versionCode,
-                                        String releaseNotes, MultipartFile apkFile) {
+    public AppVersionResponse uploadApp(String appKey, String versionName, MultipartFile apkFile) {
         validateApkFile(apkFile);
         String effectiveKey = Optional.ofNullable(appKey).filter(s -> !s.isBlank()).orElse(DEFAULT_APP_KEY);
         if (appVersionRepository.findByAppKey(effectiveKey).isPresent()) {
@@ -48,9 +47,7 @@ public class AppServiceImpl implements AppService {
         AppVersion version = AppVersion.builder()
                 .appKey(effectiveKey)
                 .versionName(versionName != null ? versionName : "1.0.0")
-                .versionCode(versionCode != null ? versionCode : 1)
                 .apkFileName(apkRelativePath)
-                .releaseNotes(releaseNotes)
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
@@ -59,8 +56,7 @@ public class AppServiceImpl implements AppService {
     }
 
     @Override
-    public AppVersionResponse updateApp(String appKey, String versionName, Integer versionCode,
-                                        String releaseNotes, MultipartFile apkFile) {
+    public AppVersionResponse updateApp(String appKey, String versionName, MultipartFile apkFile) {
         validateApkFile(apkFile);
         String effectiveKey = Optional.ofNullable(appKey).filter(s -> !s.isBlank()).orElse(DEFAULT_APP_KEY);
         AppVersion existing = appVersionRepository.findByAppKey(effectiveKey)
@@ -82,9 +78,7 @@ public class AppServiceImpl implements AppService {
         }
 
         existing.setVersionName(versionName != null ? versionName : existing.getVersionName());
-        existing.setVersionCode(versionCode != null ? versionCode : existing.getVersionCode());
         existing.setApkFileName(newRelativePath);
-        existing.setReleaseNotes(releaseNotes != null ? releaseNotes : existing.getReleaseNotes());
         existing.setUpdatedAt(LocalDateTime.now());
         appVersionRepository.save(existing);
         return toResponse(existing);

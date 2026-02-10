@@ -26,10 +26,8 @@ public class AppController {
     public ResponseEntity<AppVersionResponse> uploadApp(
             @RequestParam(value = "appKey", required = false) String appKey,
             @RequestParam(value = "versionName", required = false) String versionName,
-            @RequestParam(value = "versionCode", required = false) Integer versionCode,
-            @RequestParam(value = "releaseNotes", required = false) String releaseNotes,
             @RequestParam("apk") MultipartFile apkFile) {
-        AppVersionResponse response = appService.uploadApp(appKey, versionName, versionCode, releaseNotes, apkFile);
+        AppVersionResponse response = appService.uploadApp(appKey, versionName, apkFile);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -38,10 +36,8 @@ public class AppController {
     public ResponseEntity<AppVersionResponse> updateApp(
             @RequestParam(value = "appKey", required = false) String appKey,
             @RequestParam(value = "versionName", required = false) String versionName,
-            @RequestParam(value = "versionCode", required = false) Integer versionCode,
-            @RequestParam(value = "releaseNotes", required = false) String releaseNotes,
             @RequestParam("apk") MultipartFile apkFile) {
-        AppVersionResponse response = appService.updateApp(appKey, versionName, versionCode, releaseNotes, apkFile);
+        AppVersionResponse response = appService.updateApp(appKey, versionName, apkFile);
         return ResponseEntity.ok(response);
     }
 

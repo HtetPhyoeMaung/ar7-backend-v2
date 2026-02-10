@@ -28,7 +28,6 @@ public class AppVersion {
     @Column(nullable = false)
     private String versionName;
 
-    @Column(nullable = false)
     private Integer versionCode;
 
     @Column(nullable = false)

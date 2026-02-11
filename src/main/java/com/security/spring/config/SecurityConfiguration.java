@@ -38,7 +38,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests((authorize) -> authorize
                 // Permit all access to the following paths
                 .requestMatchers(
-                		"/games-list",
+                		"/games-list/**",
                         "/api/v1/democontroller/**",
                         "/api/v1/ggl/hot-games/**",
                         "/api/v1/user/checkAr7Id/**",

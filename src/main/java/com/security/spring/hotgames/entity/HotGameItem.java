@@ -34,9 +34,6 @@ public class HotGameItem {
     @Column(name = "game_type")
     private String gameType;
 
-    @Column(name = "product_id")
-    private Integer productId;
-
     @Column(name = "product_code")
     private Integer productCode;
 
@@ -63,9 +60,6 @@ public class HotGameItem {
 
     @Column(name = "item_type")
     private String itemType; // "GAME" or "PROVIDER"
-
-    @Column(name = "provider_sort_order")
-    private Integer providerSortOrder;
 
     @Column(name = "game_type_id")
     private Integer gameTypeId;

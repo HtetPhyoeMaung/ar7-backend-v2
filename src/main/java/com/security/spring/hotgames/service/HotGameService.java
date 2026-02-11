@@ -12,6 +12,8 @@ public interface HotGameService {
     List<HotGameItem> getHotGameItems();
     void refreshHotGames();
     void addHotGame(AddHotGameRequest request);
+    void updateHotGame(Integer id, AddHotGameRequest request);
     void removeHotGame(Integer id);
     List<HotGameItem> fetchAllAvailableGames();
+    HotGameItem getHotGameById(Integer id);
 }

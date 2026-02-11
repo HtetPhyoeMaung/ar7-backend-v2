@@ -17,8 +17,6 @@ public class AddHotGameRequest {
     @NotBlank(message = "Game type is required")
     private String gameType;
 
-    private Integer productId;
-
     @NotNull(message = "Product code is required")
     private Integer productCode;
 

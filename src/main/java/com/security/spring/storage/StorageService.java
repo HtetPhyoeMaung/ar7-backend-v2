@@ -7,14 +7,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-
-import javax.imageio.ImageIO;
 
 @Service
 public class StorageService {
@@ -47,22 +44,9 @@ public class StorageService {
         // Generate unique file name
         String filename = UUIDGenerator.generateUUID() + file.getOriginalFilename();
         
-        // Convert MultipartFile to BufferedImage
-        BufferedImage inputImage = ImageIO.read(file.getInputStream());
-        
-        // Resize image (you can specify target width and height here)
-        int targetWidth = 500;
-        int targetHeight = 300;
-        BufferedImage resizedImage = resizeImage(inputImage, targetWidth, targetHeight);
-        
-        // Convert resized BufferedImage to file
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(resizedImage, "jpg", baos);
-        byte[] resizedBytes = baos.toByteArray();
-        
-        // Save resized image to local directory
+        // Save original image without resizing
         Path filePath = uploadPath.resolve(filename);
-        Files.write(filePath, resizedBytes);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         
         return filename;
     }

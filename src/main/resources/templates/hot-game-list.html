@@ -60,6 +60,9 @@
                     <th>Category</th>
                     <th>Product Code</th>
                     <th>Type</th>
+                    <th>GT ID</th>
+                    <th>GT Name</th>
+                    <th>Rate</th>
                     <th>Status</th>
                     <th>Sort</th>
                 </tr>
@@ -78,8 +81,11 @@
                     </td>
                     <td th:text="${game.productCode}">0</td>
                     <td th:text="${game.gameType}">Type</td>
+                    <td th:text="${game.gameTypeId}">0</td>
+                    <td th:text="${game.gameTypeName}">Name</td>
+                    <td th:text="${game.conversionRate}">1.0</td>
                     <td>
-                        <span th:classappend="${game.status == '1' || game.status == 'active' ? 'text-success' : 'text-danger'}" 
+                        <span th:classappend="${game.status == '1' || game.status == 'active' || game.status == 'ACTIVATED' || game.status == 'ACTIVE' ? 'text-success' : 'text-danger'}" 
                               th:text="${game.status}">Status</span>
                     </td>
                     <td th:text="${game.sortOrder}">0</td>

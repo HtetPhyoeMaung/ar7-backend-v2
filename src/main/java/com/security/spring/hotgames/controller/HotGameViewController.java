@@ -27,6 +27,7 @@ public class HotGameViewController {
             model.addAttribute("isLive", true);
         } else {
             games = hotGameService.getHotGameItems();
+            // Optional: apply the same provider-level sorting here if requested for consistency
             model.addAttribute("isLive", false);
         }
         model.addAttribute("games", games);

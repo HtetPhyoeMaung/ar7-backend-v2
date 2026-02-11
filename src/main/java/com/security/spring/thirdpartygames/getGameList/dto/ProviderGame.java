@@ -50,4 +50,16 @@ public class ProviderGame {
 	private String platform;
 	private String gameUrl;
 	private String description;
+
+	@JsonProperty("game_type_id")
+	@JsonAlias({ "gameTypeId" })
+	private Integer gameTypeId;
+
+	@JsonProperty("game_type_name")
+	@JsonAlias({ "gameTypeName" })
+	private String gameTypeName;
+
+	@JsonProperty("conversion_rate")
+	@JsonAlias({ "conversionRate" })
+	private Double conversionRate;
 }

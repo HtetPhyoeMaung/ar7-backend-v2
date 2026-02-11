@@ -131,20 +131,25 @@ public class GetGameListServiceImpl implements GetGameListService {
             // Send GET request
             response = restTemplate.getForEntity(uri, GameListResponse.class);
         }
+
+        // Always try to get provider info to populate extra fields
+        GameType gameTypeObj = gameTypeRepo.findByCode(data.getGameType()).orElse(null);
         GameSoftGameProvider gameSoftGameProvider = null;
-        if(!data.isFromHotGame()) {
-        	 // Get provider info
-            GameType gameTypeObj = gameTypeRepo.findByCode(data.getGameType()).orElseThrow(() ->
-                    new DataNotFoundException("GameType not found by Description : " + data.getGameType()));
-            gameSoftGameProvider = gameProviderRepo.findByProductAndGameType(
-                    (long) data.getProductID(), gameTypeObj).orElseThrow(() ->
-                    new DataNotFoundException("GameProvider not found by Product and GameType."));
-		}
+        if (gameTypeObj != null) {
+            gameSoftGameProvider = gameProviderRepo.findByProductAndGameType((long) data.getProductID(), gameTypeObj).orElse(null);
+        }
+
+        if (response.getBody() != null && response.getBody().getProviderGames() != null && gameSoftGameProvider != null) {
+            for (ProviderGame pg : response.getBody().getProviderGames()) {
+                if (pg.getGameTypeId() == null) pg.setGameTypeId(gameSoftGameProvider.getGameType().getId());
+                if (pg.getGameTypeName() == null) pg.setGameTypeName(gameSoftGameProvider.getGameType().getDescription());
+                if (pg.getConversionRate() == null) pg.setConversionRate(gameSoftGameProvider.getConversionRate());
+            }
+        }
 
         log.info("Get Game List Response: {}", response.getBody());
         return GetGameListResponse.builder()
         .gameListResponse(response.getBody())
-        // If provider is null (like in HotGame requests), just put null or empty string
         .productName(gameSoftGameProvider != null ? gameSoftGameProvider.getProductCode() : "")
         .build();
     }

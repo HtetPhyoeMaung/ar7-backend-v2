@@ -19,5 +19,5 @@ public interface AdsService {
 
     ResponseEntity<CustomResponse<AdsResponse>> getListAds(Ads.AdsType type, Ads.ViewType viewType);
 
-    ResponseEntity<CustomResponse<AdsResponse>> getAllAds();
+    ResponseEntity<CustomResponse<AdsResponse>> getAllAds(Ads.AdsType type);
 }

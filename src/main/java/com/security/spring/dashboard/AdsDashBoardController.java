@@ -20,8 +20,10 @@ public class AdsDashBoardController {
     private final AdsService adsService;
 
     @GetMapping
-    public ResponseEntity<CustomResponse<AdsResponse>> listAllAds() {
-        return adsService.getAllAds();
+    public ResponseEntity<CustomResponse<AdsResponse>> listAllAds(
+        @RequestParam(name = "type") Ads.AdsType type
+    ) {
+        return adsService.getAllAds(type);
     }
 
     @PostMapping

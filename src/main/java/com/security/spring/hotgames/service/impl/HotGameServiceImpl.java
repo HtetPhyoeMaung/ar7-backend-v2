@@ -15,6 +15,7 @@ import com.security.spring.hotgames.dto.AddHotGameRequest;
 import com.security.spring.hotgames.entity.HotGameItem;
 import com.security.spring.hotgames.repository.HotGameItemRepository;
 import com.security.spring.hotgames.service.HotGameService;
+import com.security.spring.storage.StorageService;
 import com.security.spring.thirdpartygames.gameType.repo.GameTypeRepo;
 import com.security.spring.thirdpartygames.gameprovider.entity.GameSoftGameProvider;
 import com.security.spring.thirdpartygames.gameprovider.repository.GameProviderRepo;
@@ -33,6 +34,7 @@ public class HotGameServiceImpl implements HotGameService {
     private final HotGameItemRepository hotGameItemRepository;
     private final GetGameListService getGameListService;
     private final GameProviderRepo gameProviderRepo;
+    private final StorageService storageService;
 
     private static final Comparator<HotGameItem> HOT_GAME_COMPARATOR = Comparator
             .comparing((HotGameItem a) -> a.getSortOrder() != null ? a.getSortOrder() : 9999);
@@ -80,8 +82,15 @@ public class HotGameServiceImpl implements HotGameService {
     @Override
     public List<HotGameItem> getHotGameItems() {
         List<HotGameItem> items = hotGameItemRepository.findAll();
+        items.forEach(this::resolveImageUrl);
         items.sort(Comparator.comparing(HotGameItem::getCategory).thenComparing(HOT_GAME_COMPARATOR));
         return items;
+    }
+
+    private void resolveImageUrl(HotGameItem item) {
+        if ("hotLiveCasino".equals(item.getCategory()) && item.getImageUrl() != null && !item.getImageUrl().isEmpty() && !item.getImageUrl().startsWith("http")) {
+            item.setImageUrl(storageService.getImageByName(item.getImageUrl()));
+        }
     }
 
     @Override
@@ -122,10 +131,25 @@ public class HotGameServiceImpl implements HotGameService {
                 log.error("Failed to refresh games for product {} type {}", key.productCode, key.gameType, e);
             }
         }
+
+        // Sync local provider images for hotLiveCasino category (covers PROVIDER items and items not in freshMap)
+        for (HotGameItem item : allItems) {
+            if ("hotLiveCasino".equals(item.getCategory()) && item.getProductCode() != null) {
+                gameProviderRepo.findByProductAndGameType_Code(item.getProductCode().longValue(), item.getGameType())
+                        .ifPresent(provider -> {
+                            if (provider.getImageName() != null && !Objects.equals(item.getImageUrl(), provider.getImageName())) {
+                                item.setImageUrl(provider.getImageName());
+                                if (itemsToUpdateTotal.stream().noneMatch(i -> Objects.equals(i.getId(), item.getId()))) {
+                                    itemsToUpdateTotal.add(item);
+                                }
+                            }
+                        });
+            }
+        }
         
         if (!itemsToUpdateTotal.isEmpty()) {
             hotGameItemRepository.saveAll(itemsToUpdateTotal);
-            log.info("Refreshed {} hot game items", itemsToUpdateTotal.size());
+            log.info("Refreshed {} hot game items (including local provider image sync)", itemsToUpdateTotal.size());
         }
     }
 
@@ -143,8 +167,13 @@ public class HotGameServiceImpl implements HotGameService {
                 .gameType(request.getGameType())
                 .productCode(request.getProductCode())
                 .sortOrder(request.getSortOrder())
-                .itemType("GAME")
+                .itemType("hotLiveCasino".equals(request.getCategory()) && request.getGameCode() != null && request.getGameCode().endsWith("_PROV") ? "PROVIDER" : "GAME")
                 .build();
+
+        if ("hotLiveCasino".equals(request.getCategory())) {
+            gameProviderRepo.findByProductAndGameType_Code(request.getProductCode().longValue(), request.getGameType())
+                    .ifPresent(provider -> item.setImageUrl(provider.getImageName()));
+        }
 
         // Immediately fetch details if available
         try {
@@ -178,6 +207,12 @@ public class HotGameServiceImpl implements HotGameService {
         item.setGameType(request.getGameType());
         item.setProductCode(request.getProductCode());
         item.setSortOrder(request.getSortOrder());
+        item.setItemType("hotLiveCasino".equals(request.getCategory()) && request.getGameCode() != null && request.getGameCode().endsWith("_PROV") ? "PROVIDER" : "GAME");
+
+        if ("hotLiveCasino".equals(request.getCategory())) {
+            gameProviderRepo.findByProductAndGameType_Code(request.getProductCode().longValue(), request.getGameType())
+                    .ifPresent(provider -> item.setImageUrl(provider.getImageName()));
+        }
 
         // Fetch details to ensure they are up to date
         try {
@@ -208,7 +243,10 @@ public class HotGameServiceImpl implements HotGameService {
 
     @Override
     public HotGameItem getHotGameById(Integer id) {
-        return hotGameItemRepository.findById(id).orElse(null);
+        return hotGameItemRepository.findById(id).map(item -> {
+            resolveImageUrl(item);
+            return item;
+        }).orElse(null);
     }
 
     @Override
@@ -223,6 +261,11 @@ public class HotGameServiceImpl implements HotGameService {
             Integer currentProviderProduct = provider.getProduct().intValue(); // This will be 2026 for GameBank
             boolean isLiveCasino = "LIVE_CASINO".equalsIgnoreCase(gameTypeCode);
             
+            String providerImageUrl = isLiveCasino ? provider.getImageName() : null;
+            if (providerImageUrl != null && !providerImageUrl.isEmpty() && !providerImageUrl.startsWith("http")) {
+                providerImageUrl = storageService.getImageByName(providerImageUrl);
+            }
+            
             // 1. Add Provider entry
             allItems.add(HotGameItem.builder()
                     .gameName(provider.getProductCode() + " Provider")
@@ -233,6 +276,7 @@ public class HotGameServiceImpl implements HotGameService {
                     .category(isLiveCasino ? "hotLiveCasino" : provider.getProductCode() + " - " + gameTypeCode)
                     .itemType("PROVIDER")
                     .sortOrder(0)
+                    .imageUrl(providerImageUrl)
                     .gameTypeId(provider.getGameType().getId())
                     .gameTypeName(provider.getGameType().getDescription())
                     .conversionRate(1.0)
@@ -292,15 +336,24 @@ public class HotGameServiceImpl implements HotGameService {
         item.setGameTypeId(fresh.getGameTypeId());
         item.setGameTypeName(fresh.getGameTypeName());
         item.setConversionRate(fresh.getConversionRate());
+
+        if ("hotLiveCasino".equals(item.getCategory())) {
+            gameProviderRepo.findByProductAndGameType_Code(item.getProductCode().longValue(), item.getGameType())
+                    .ifPresent(provider -> item.setImageUrl(provider.getImageName()));
+            }
     }
 
     private ProviderGame mapToProviderGame(HotGameItem item) {
+        String imageUrl = item.getImageUrl();
+        if ("hotLiveCasino".equals(item.getCategory()) && imageUrl != null && !imageUrl.isEmpty() && !imageUrl.startsWith("http")) {
+            imageUrl = storageService.getImageByName(imageUrl);
+        }
         return ProviderGame.builder()
                 .gameCode(item.getGameCode())
                 .gameName(item.getGameName())
                 .gameType(item.getGameType())
                 .productCode(item.getProductCode() != null ? item.getProductCode() : 0)
-                .imageUrl(item.getImageUrl())
+                .imageUrl(imageUrl)
                 .supportCurrency(item.getSupportCurrency())
                 .status(item.getStatus())
                 .platform(item.getPlatform())

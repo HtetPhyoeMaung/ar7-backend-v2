@@ -139,10 +139,14 @@ public class HotGameServiceImpl implements HotGameService {
                         .ifPresent(provider -> {
                             if (provider.getImageName() != null && !Objects.equals(item.getImageUrl(), provider.getImageName())) {
                                 item.setImageUrl(provider.getImageName());
-                                if (itemsToUpdateTotal.stream().noneMatch(i -> Objects.equals(i.getId(), item.getId()))) {
-                                    itemsToUpdateTotal.add(item);
-                                }
                             }
+                            
+                            if(provider.getProductCode() != null && !Objects.equals(item.getGameName(), provider.getProductCode())) {
+								item.setGameName(provider.getProductCode());
+							}
+							if (itemsToUpdateTotal.stream().noneMatch(i -> Objects.equals(i.getId(), item.getId()))) {
+								itemsToUpdateTotal.add(item);
+							}
                         });
             }
         }
@@ -172,7 +176,9 @@ public class HotGameServiceImpl implements HotGameService {
 
         if ("hotLiveCasino".equals(request.getCategory())) {
             gameProviderRepo.findByProductAndGameType_Code(request.getProductCode().longValue(), request.getGameType())
-                    .ifPresent(provider -> item.setImageUrl(provider.getImageName()));
+                    .ifPresent(provider -> {
+                    	item.setImageUrl(provider.getImageName());
+                    	item.setGameName(provider.getProductCode());});
         }
 
         // Immediately fetch details if available
@@ -211,7 +217,9 @@ public class HotGameServiceImpl implements HotGameService {
 
         if ("hotLiveCasino".equals(request.getCategory())) {
             gameProviderRepo.findByProductAndGameType_Code(request.getProductCode().longValue(), request.getGameType())
-                    .ifPresent(provider -> item.setImageUrl(provider.getImageName()));
+                    .ifPresent(provider -> {
+                    	item.setImageUrl(provider.getImageName());
+                    	item.setGameName(provider.getProductCode());});
         }
 
         // Fetch details to ensure they are up to date
@@ -339,7 +347,10 @@ public class HotGameServiceImpl implements HotGameService {
 
         if ("hotLiveCasino".equals(item.getCategory())) {
             gameProviderRepo.findByProductAndGameType_Code(item.getProductCode().longValue(), item.getGameType())
-                    .ifPresent(provider -> item.setImageUrl(provider.getImageName()));
+                    .ifPresent(provider -> {
+                    	item.setImageUrl(provider.getImageName());
+                    	item.setGameName(provider.getProductCode());
+                    });
             }
     }
 

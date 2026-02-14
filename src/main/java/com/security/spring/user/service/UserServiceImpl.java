@@ -229,17 +229,8 @@ public class UserServiceImpl implements UserService{
                     .secretCode(data.getSecretCode())
                     .parentUserId(data.getParentUserId())
                     .build();
-            if (ar7Id.startsWith("AFG")){
-
-                 var userDetailReport =   userDetailReportService.getUserDetailReportByAr7Id(data.getAr7Id(), LocalDate.now().atStartOfDay(),LocalDate.now().with(TemporalAdjusters.lastDayOfMonth()).atStartOfDay());
-                 if (userDetailReport != null) {
-                     userResponseObj.setWinLoseAmount(userDetailReport.getUserReportObjList()
-                             .stream().mapToDouble(UserReportObj::getWinLoseAmount).sum());
-                 }else {
-                     userResponseObj.setWinLoseAmount(0);
-                 }
-
-            }
+            // Populate win/lose: for AF Agent = commission to pay (from referred users); for User = game transaction win/lose
+            setDownlineUserWinLoseAmounts(data, userResponseObj);
             if(data.getTicketBox() != null){
                 TicketBox ticketBox = data.getTicketBox();
                 TicketBoxResponse ticketBoxResponse = TicketBoxResponse.builder()
@@ -262,6 +253,74 @@ public class UserServiceImpl implements UserService{
                 .currentPage(userPage.getNumber())
                 .pageSize(userPage.getSize())
                 .build();
+    }
+
+    /**
+     * Populates winLoseAmount (all-time), winLoseAmountThisMonth, and winLoseAmountLastMonth for a downline entry.
+     * - AF Agent: amount the parent Agent pays (commission from referred users' play).
+     * - User (and others): net win/lose from the user's own game transactions.
+     */
+    private void setDownlineUserWinLoseAmounts(User downlineUser, UserResponseObj userResponseObj) {
+        if (downlineUser.getRole() == Role.AFFILIATEAGENT) {
+            setAffiliateAgentWinLoseToPay(downlineUser, userResponseObj);
+        } else {
+            setUserGameWinLoseAmounts(downlineUser.getAr7Id(), userResponseObj);
+        }
+    }
+
+    /** AF Agent: win/lose = commission to pay from referred users (all-time, this month, last month). */
+    private void setAffiliateAgentWinLoseToPay(User affiliateAgent, UserResponseObj userResponseObj) {
+        try {
+            double allTime = calculateAffiliateWinLoseAmount(affiliateAgent, null, null);
+            userResponseObj.setWinLoseAmount(allTime);
+
+            LocalDate today = LocalDate.now();
+            LocalDateTime thisMonthStart = today.with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay();
+            LocalDateTime thisMonthEnd = today.with(TemporalAdjusters.lastDayOfMonth()).atTime(LocalTime.MAX);
+            userResponseObj.setWinLoseAmountThisMonth(calculateAffiliateWinLoseAmount(affiliateAgent, thisMonthStart, thisMonthEnd));
+
+            LocalDate lastMonth = today.minusMonths(1);
+            LocalDateTime lastMonthStart = lastMonth.with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay();
+            LocalDateTime lastMonthEnd = lastMonth.with(TemporalAdjusters.lastDayOfMonth()).atTime(LocalTime.MAX);
+            userResponseObj.setWinLoseAmountLastMonth(calculateAffiliateWinLoseAmount(affiliateAgent, lastMonthStart, lastMonthEnd));
+        } catch (Exception e) {
+            userResponseObj.setWinLoseAmount(0.0);
+            userResponseObj.setWinLoseAmountThisMonth(0.0);
+            userResponseObj.setWinLoseAmountLastMonth(0.0);
+        }
+    }
+
+    /** User: win/lose from own game transactions (all-time, this month, last month). */
+    private void setUserGameWinLoseAmounts(String downlineAr7Id, UserResponseObj userResponseObj) {
+        try {
+            var allTimeReport = userDetailReportService.getUserDetailReportByAr7Id(downlineAr7Id, null, null);
+            double allTime = allTimeReport != null && allTimeReport.getUserReportObjList() != null
+                    ? allTimeReport.getUserReportObjList().stream().mapToDouble(UserReportObj::getWinLoseAmount).sum()
+                    : 0.0;
+            userResponseObj.setWinLoseAmount(allTime);
+
+            LocalDate today = LocalDate.now();
+            LocalDateTime thisMonthStart = today.with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay();
+            LocalDateTime thisMonthEnd = today.with(TemporalAdjusters.lastDayOfMonth()).atTime(LocalTime.MAX);
+            var thisMonthReport = userDetailReportService.getUserDetailReportByAr7Id(downlineAr7Id, thisMonthStart, thisMonthEnd);
+            double thisMonth = thisMonthReport != null && thisMonthReport.getUserReportObjList() != null
+                    ? thisMonthReport.getUserReportObjList().stream().mapToDouble(UserReportObj::getWinLoseAmount).sum()
+                    : 0.0;
+            userResponseObj.setWinLoseAmountThisMonth(thisMonth);
+
+            LocalDate lastMonth = today.minusMonths(1);
+            LocalDateTime lastMonthStart = lastMonth.with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay();
+            LocalDateTime lastMonthEnd = lastMonth.with(TemporalAdjusters.lastDayOfMonth()).atTime(LocalTime.MAX);
+            var lastMonthReport = userDetailReportService.getUserDetailReportByAr7Id(downlineAr7Id, lastMonthStart, lastMonthEnd);
+            double lastMonthAmount = lastMonthReport != null && lastMonthReport.getUserReportObjList() != null
+                    ? lastMonthReport.getUserReportObjList().stream().mapToDouble(UserReportObj::getWinLoseAmount).sum()
+                    : 0.0;
+            userResponseObj.setWinLoseAmountLastMonth(lastMonthAmount);
+        } catch (DataNotFoundException e) {
+            userResponseObj.setWinLoseAmount(0.0);
+            userResponseObj.setWinLoseAmountThisMonth(0.0);
+            userResponseObj.setWinLoseAmountLastMonth(0.0);
+        }
     }
 
     @Override

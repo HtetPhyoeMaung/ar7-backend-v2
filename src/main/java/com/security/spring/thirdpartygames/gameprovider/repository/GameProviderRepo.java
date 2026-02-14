@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 public interface GameProviderRepo extends JpaRepository<GameSoftGameProvider,Integer> {
     Optional<GameSoftGameProvider> findByProductAndGameType(Long product, GameType gameType);
+    Optional<GameSoftGameProvider> findByProductAndGameType_Code(Long product, String gameTypeCode);
     List<GameSoftGameProvider> findByGameType(GameType gameType);
 
     void deleteAllByProductCodeIn(List<String> rejectProviderList);

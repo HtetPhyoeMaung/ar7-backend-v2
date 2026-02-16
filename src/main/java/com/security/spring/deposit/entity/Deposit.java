@@ -1,5 +1,6 @@
 package com.security.spring.deposit.entity;
 
+import com.security.spring.bank.bankName.entity.BankName;
 import com.security.spring.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -41,6 +42,11 @@ public class Deposit {
 
     @Column(nullable = false)
     private String accountName;
+
+    @ManyToOne
+    @JoinColumn(name = "bank_name_id")
+    @ToString.Exclude
+    private BankName bankName;
 
     private String remark;
     @Enumerated(EnumType.STRING)

@@ -14,11 +14,13 @@ import java.time.LocalDateTime;
 @Builder
 public class DepositObj {
     private Long id;
+    private Integer userId;
     private double amount;
     private String fromUsername;
     private String fromBankName;
     private String toUserName;
     private String bankAcc;
+    private String bankName;
     private String userTransitionId;
     private String adminTransitionId;
     private DepositStatus status;

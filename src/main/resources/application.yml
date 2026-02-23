@@ -40,6 +40,15 @@ spring:
     swagger-ui:
       path: /swagger-ui.html
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
 file:
   upload-dir: ./upload-dir
   cdn:
@@ -76,3 +85,10 @@ cloud:
       static: sgp1
     stack:
       auto: false
+
+z.monitor:
+  users:
+    - username: admin
+      password: admin123
+      role: ADMIN
+      name: Administrator

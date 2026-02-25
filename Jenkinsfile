@@ -26,9 +26,8 @@ pipeline {
                             ssh -o StrictHostKeyChecking=no root@${env.PROD_IP} "
                             cd ar7-backend-v2 && \
                             git pull origin master && \
-                            docker compose up -d --build && \
-                            echo '--- Streaming backend-app logs for 15 seconds ---' && \
-                            timeout 15s docker logs -f backend-app || true"
+                            chmod +x deploy-with-drain.sh && \
+                            ./deploy-with-drain.sh"
                         """
                     }
                 }

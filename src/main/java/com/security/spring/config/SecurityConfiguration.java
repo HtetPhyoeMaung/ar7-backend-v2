@@ -66,7 +66,8 @@ public class SecurityConfiguration {
                          ,"/api/v1/game-bank/seamless/**",
                          "/z-monitor/login",
                          "/z-monitor/auth",
-                         "/z-monitor/**"
+                         "/z-monitor/**",
+                         "/api/v1/internal/**"
 //                        "/api/v1/gt/**",
 //                        "/api/v1/gameproduct/**"
                         ).permitAll()

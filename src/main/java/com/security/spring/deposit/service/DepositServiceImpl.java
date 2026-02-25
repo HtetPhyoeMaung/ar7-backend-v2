@@ -183,7 +183,7 @@ public class DepositServiceImpl implements DepositService{
 
         depositPage.map(obj -> depositObjList.add(DepositObj.builder()
                 .id(obj.getId())
-                .userId(obj.getToAcc() != null ? obj.getToAcc().getUserId() : null)
+                .ar7Id(obj.getToAcc() != null ? obj.getToAcc().getAr7Id() : null)
                 .amount(obj.getAmount())
                 .fromUsername(obj.getFromAcc() != null ? obj.getFromAcc().getName() : null)
                 .fromBankName(obj.getAccountName())

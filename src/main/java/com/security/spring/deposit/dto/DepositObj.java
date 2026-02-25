@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 public class DepositObj {
     private Long id;
-    private Integer userId;
+    private String ar7Id;
     private double amount;
     private String fromUsername;
     private String fromBankName;

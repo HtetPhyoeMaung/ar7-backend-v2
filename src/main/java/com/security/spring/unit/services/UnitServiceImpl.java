@@ -377,7 +377,12 @@ public class UnitServiceImpl implements UnitService{
     public TransitionResponse getAllTransitionHistoryByUserId(String ar7Id, int page, int size, LocalDateTime startDate, LocalDateTime endDate) {
         User user = userService.findByAr7Id(ar7Id);
         Pageable pageable = PageRequest.of(page, size).withSort(Sort.Direction.DESC,"id");
-       Page<TransitionHistory> transitionHistories = transitionHistoryRepo.findByActionTimeBetweenAndFromUserOrToUser(startDate,endDate,user,user,pageable);
+        Page<TransitionHistory> transitionHistories;
+        if (startDate == null || endDate == null) {
+            transitionHistories = transitionHistoryRepo.findByFromUserOrToUser(user, user, pageable);
+        } else {
+            transitionHistories = transitionHistoryRepo.findByActionTimeBetweenAndFromUserOrToUser(startDate, endDate, user, user, pageable);
+        }
         List<TransitionObj> transitionObjList = transitionHistories
                 .stream()
                 .map(obj -> {
